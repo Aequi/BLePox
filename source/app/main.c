@@ -40,7 +40,7 @@ static void NRF_SwitchToBleMode(bool eraseBonds)
 int main(void)
 {
     gpioHalInit();
-    //adcHalInit(onAdcDataReady);
+    adcHalInit(onAdcDataReady);
 
     nrf_delay_ms(1000);
     //gpioPwrOn(true);

@@ -48,7 +48,7 @@ RAM              0x20002080         0x00001f80         xrw
 Linker script and memory map
 
 
-.text           0x0001b000    0x13894
+.text           0x0001b000    0x138a0
  *(.isr_vector)
  .isr_vector    0x0001b000       0xc0 obj\debug\components\toolchain\gcc\gcc_startup_nrf51.o
                 0x0001b000                __isr_vector
@@ -4471,66 +4471,66 @@ Linker script and memory map
                 0x0002e010       0x3c obj\debug\source\app\main.o
  .text.NRF_SwitchToBleMode
                 0x0002e04c       0x2c obj\debug\source\app\main.o
- .text.main     0x0002e078       0xa0 obj\debug\source\app\main.o
+ .text.main     0x0002e078       0xac obj\debug\source\app\main.o
                 0x0002e078                main
- .text          0x0002e118        0x0 obj\debug\source\gpio\gpio_hal.o
+ .text          0x0002e124        0x0 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_cfg
-                0x0002e118       0x60 obj\debug\source\gpio\gpio_hal.o
+                0x0002e124       0x60 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_cfg_output
-                0x0002e178       0x24 obj\debug\source\gpio\gpio_hal.o
+                0x0002e184       0x24 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_cfg_input
-                0x0002e19c       0x30 obj\debug\source\gpio\gpio_hal.o
+                0x0002e1a8       0x30 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_pin_set
-                0x0002e1cc       0x20 obj\debug\source\gpio\gpio_hal.o
+                0x0002e1d8       0x20 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_pin_clear
-                0x0002e1ec       0x24 obj\debug\source\gpio\gpio_hal.o
+                0x0002e1f8       0x24 obj\debug\source\gpio\gpio_hal.o
  .text.nrf_gpio_pin_read
-                0x0002e210       0x24 obj\debug\source\gpio\gpio_hal.o
+                0x0002e21c       0x24 obj\debug\source\gpio\gpio_hal.o
  .text.gpioHalInit
-                0x0002e234       0x20 obj\debug\source\gpio\gpio_hal.o
-                0x0002e234                gpioHalInit
+                0x0002e240       0x20 obj\debug\source\gpio\gpio_hal.o
+                0x0002e240                gpioHalInit
  .text.gpioHalReadButton
-                0x0002e254       0x18 obj\debug\source\gpio\gpio_hal.o
-                0x0002e254                gpioHalReadButton
+                0x0002e260       0x18 obj\debug\source\gpio\gpio_hal.o
+                0x0002e260                gpioHalReadButton
  .text.gpioPwrOn
-                0x0002e26c       0x2c obj\debug\source\gpio\gpio_hal.o
-                0x0002e26c                gpioPwrOn
+                0x0002e278       0x2c obj\debug\source\gpio\gpio_hal.o
+                0x0002e278                gpioPwrOn
  .text.gpioLedOn
-                0x0002e298       0x2c obj\debug\source\gpio\gpio_hal.o
-                0x0002e298                gpioLedOn
+                0x0002e2a4       0x2c obj\debug\source\gpio\gpio_hal.o
+                0x0002e2a4                gpioLedOn
  .text.gpioLedOnRed
-                0x0002e2c4       0x30 obj\debug\source\gpio\gpio_hal.o
-                0x0002e2c4                gpioLedOnRed
- .text          0x0002e2f4      0x114 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_udivsi3.o)
-                0x0002e2f4                __aeabi_uidiv
-                0x0002e2f4                __udivsi3
-                0x0002e400                __aeabi_uidivmod
- .text          0x0002e408      0x1d4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_divsi3.o)
-                0x0002e408                __divsi3
-                0x0002e408                __aeabi_idiv
-                0x0002e5d4                __aeabi_idivmod
- .text          0x0002e5dc        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_dvmd_tls.o)
-                0x0002e5dc                __aeabi_idiv0
-                0x0002e5dc                __aeabi_ldiv0
- .text          0x0002e5e0        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcmp.o)
- .text.memcmp   0x0002e5e0       0x1e c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcmp.o)
-                0x0002e5e0                memcmp
- .text          0x0002e5fe        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcpy-stub.o)
- .text.memcpy   0x0002e5fe       0x12 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcpy-stub.o)
-                0x0002e5fe                memcpy
- .text          0x0002e610        0xe c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-strlen.o)
-                0x0002e610                strlen
- .text          0x0002e61e        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtend.o
- .text          0x0002e61e        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
+                0x0002e2d0       0x30 obj\debug\source\gpio\gpio_hal.o
+                0x0002e2d0                gpioLedOnRed
+ .text          0x0002e300      0x114 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_udivsi3.o)
+                0x0002e300                __aeabi_uidiv
+                0x0002e300                __udivsi3
+                0x0002e40c                __aeabi_uidivmod
+ .text          0x0002e414      0x1d4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_divsi3.o)
+                0x0002e414                __divsi3
+                0x0002e414                __aeabi_idiv
+                0x0002e5e0                __aeabi_idivmod
+ .text          0x0002e5e8        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m\libgcc.a(_dvmd_tls.o)
+                0x0002e5e8                __aeabi_idiv0
+                0x0002e5e8                __aeabi_ldiv0
+ .text          0x0002e5ec        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcmp.o)
+ .text.memcmp   0x0002e5ec       0x1e c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcmp.o)
+                0x0002e5ec                memcmp
+ .text          0x0002e60a        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcpy-stub.o)
+ .text.memcpy   0x0002e60a       0x12 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-memcpy-stub.o)
+                0x0002e60a                memcpy
+ .text          0x0002e61c        0xe c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc_n.a(lib_a-strlen.o)
+                0x0002e61c                strlen
+ .text          0x0002e62a        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtend.o
+ .text          0x0002e62a        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
  *(.init)
- *fill*         0x0002e61e        0x2 
- .init          0x0002e620        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crti.o
-                0x0002e620                _init
- .init          0x0002e624        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
+ *fill*         0x0002e62a        0x2 
+ .init          0x0002e62c        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crti.o
+                0x0002e62c                _init
+ .init          0x0002e630        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
  *(.fini)
- .fini          0x0002e62c        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crti.o
-                0x0002e62c                _fini
- .fini          0x0002e630        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
+ .fini          0x0002e638        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crti.o
+                0x0002e638                _fini
+ .fini          0x0002e63c        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtn.o
  *crtbegin.o(.ctors)
  *crtbegin?.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o *crtend?.o) .ctors)
@@ -4543,82 +4543,82 @@ Linker script and memory map
  *(.dtors)
  *(.rodata*)
  .rodata.str1.4
-                0x0002e638        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc.a(lib_a-impure.o)
+                0x0002e644        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc.a(lib_a-impure.o)
                                   0x2 (size before relaxing)
  .rodata._global_impure_ptr
-                0x0002e63c        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc.a(lib_a-impure.o)
-                0x0002e63c                _global_impure_ptr
+                0x0002e648        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libc.a(lib_a-impure.o)
+                0x0002e648                _global_impure_ptr
  .rodata.m_conn_params_timer_id
-                0x0002e640        0x4 obj\debug\components\ble\common\ble_conn_params.o
+                0x0002e64c        0x4 obj\debug\components\ble\common\ble_conn_params.o
  .rodata.set_security_req
-                0x0002e644       0x18 obj\debug\components\ble\common\ble_srv_common.o
+                0x0002e650       0x18 obj\debug\components\ble\common\ble_srv_common.o
  .rodata.m_service_context_store
-                0x0002e65c       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
-                0x0002e65c                m_service_context_store
+                0x0002e668       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
+                0x0002e668                m_service_context_store
  .rodata.m_service_context_load
-                0x0002e66c       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
-                0x0002e66c                m_service_context_load
+                0x0002e678       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
+                0x0002e678                m_service_context_load
  .rodata.m_service_context_apply
-                0x0002e67c       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
-                0x0002e67c                m_service_context_apply
+                0x0002e688       0x10 obj\debug\components\ble\device_manager\device_manager_peripheral.o
+                0x0002e688                m_service_context_apply
  .rodata.m_context_init_len
-                0x0002e68c        0x4 obj\debug\components\ble\device_manager\device_manager_peripheral.o
-                0x0002e68c                m_context_init_len
+                0x0002e698        0x4 obj\debug\components\ble\device_manager\device_manager_peripheral.o
+                0x0002e698                m_context_init_len
  .rodata.dm_ble_evt_handler
-                0x0002e690      0x10c obj\debug\components\ble\device_manager\device_manager_peripheral.o
+                0x0002e69c      0x10c obj\debug\components\ble\device_manager\device_manager_peripheral.o
  .rodata.m_default_config
-                0x0002e79c        0x1 obj\debug\components\drivers_nrf\adc\nrf_drv_adc.o
- *fill*         0x0002e79d        0x3 
+                0x0002e7a8        0x1 obj\debug\components\drivers_nrf\adc\nrf_drv_adc.o
+ *fill*         0x0002e7a9        0x3 
  .rodata.swap_sub_state_sm_lut.6776
-                0x0002e7a0       0x14 obj\debug\components\drivers_nrf\pstorage\pstorage.o
+                0x0002e7ac       0x14 obj\debug\components\drivers_nrf\pstorage\pstorage.o
  .rodata.swap_sub_state_sm_lut.6851
-                0x0002e7b4       0x14 obj\debug\components\drivers_nrf\pstorage\pstorage.o
+                0x0002e7c0       0x14 obj\debug\components\drivers_nrf\pstorage\pstorage.o
  .rodata.m_default_config
-                0x0002e7c8       0x10 obj\debug\components\drivers_nrf\spi_master\nrf_drv_spi.o
+                0x0002e7d4       0x10 obj\debug\components\drivers_nrf\spi_master\nrf_drv_spi.o
  .rodata.m_default_config
-                0x0002e7d8        0x8 obj\debug\components\drivers_nrf\timer\nrf_drv_timer.o
+                0x0002e7e4        0x8 obj\debug\components\drivers_nrf\timer\nrf_drv_timer.o
  .rodata.m_default_config
-                0x0002e7e0       0x20 obj\debug\components\drivers_nrf\uart\nrf_drv_uart.o
- .rodata        0x0002e800       0x20 obj\debug\components\libraries\uart\app_uart_fifo.o
+                0x0002e7ec       0x20 obj\debug\components\drivers_nrf\uart\nrf_drv_uart.o
+ .rodata        0x0002e80c       0x20 obj\debug\components\libraries\uart\app_uart_fifo.o
  .rodata.m_timer
-                0x0002e820        0x8 obj\debug\source\adc\adc_hal.o
- .rodata        0x0002e828       0x44 obj\debug\source\app\ble_stack.o
+                0x0002e82c        0x8 obj\debug\source\adc\adc_hal.o
+ .rodata        0x0002e834       0x44 obj\debug\source\app\ble_stack.o
  .rodata.on_adv_evt
-                0x0002e86c       0x24 obj\debug\source\app\ble_stack.o
+                0x0002e878       0x24 obj\debug\source\app\ble_stack.o
  *(.eh_frame*)
- .eh_frame      0x0002e890        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
- .eh_frame      0x0002e890        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtend.o
+ .eh_frame      0x0002e89c        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
+ .eh_frame      0x0002e89c        0x4 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtend.o
 
-.glue_7         0x0002e894        0x0
- .glue_7        0x0002e894        0x0 linker stubs
+.glue_7         0x0002e8a0        0x0
+ .glue_7        0x0002e8a0        0x0 linker stubs
 
-.glue_7t        0x0002e894        0x0
- .glue_7t       0x0002e894        0x0 linker stubs
+.glue_7t        0x0002e8a0        0x0
+ .glue_7t       0x0002e8a0        0x0 linker stubs
 
-.vfp11_veneer   0x0002e894        0x0
- .vfp11_veneer  0x0002e894        0x0 linker stubs
+.vfp11_veneer   0x0002e8a0        0x0
+ .vfp11_veneer  0x0002e8a0        0x0 linker stubs
 
-.v4_bx          0x0002e894        0x0
- .v4_bx         0x0002e894        0x0 linker stubs
+.v4_bx          0x0002e8a0        0x0
+ .v4_bx         0x0002e8a0        0x0 linker stubs
 
-.iplt           0x0002e894        0x0
- .iplt          0x0002e894        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
+.iplt           0x0002e8a0        0x0
+ .iplt          0x0002e8a0        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
 
-.ARM.extab      0x0002e894        0x0
+.ARM.extab      0x0002e8a0        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x0002e894        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m/crt0.o
-                0x0002e894                __exidx_start = .
+ .ARM.extab     0x0002e8a0        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m/crt0.o
+                0x0002e8a0                __exidx_start = .
 
-.ARM.exidx      0x0002e894        0x8
+.ARM.exidx      0x0002e8a0        0x8
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x0002e894        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m/crt0.o
-                0x0002e89c                __exidx_end = .
-                0x0002e89c                __etext = .
+ .ARM.exidx     0x0002e8a0        0x8 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m/crt0.o
+                0x0002e8a8                __exidx_end = .
+                0x0002e8a8                __etext = .
 
-.rel.dyn        0x0002e89c        0x0
- .rel.iplt      0x0002e89c        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
+.rel.dyn        0x0002e8a8        0x0
+ .rel.iplt      0x0002e8a8        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
 
-.data           0x20002080      0x478 load address 0x0002e89c
+.data           0x20002080      0x478 load address 0x0002e8a8
                 0x20002080                __data_start__ = .
  *(vtable)
  *(.data*)
@@ -4738,7 +4738,7 @@ LOAD c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-
 LOAD c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv6-m\libnosys.a
 END GROUP
 
-.igot.plt       0x200024f8        0x0 load address 0x0002ed14
+.igot.plt       0x200024f8        0x0 load address 0x0002ed20
  .igot.plt      0x200024f8        0x0 c:/program files (x86)/embitz/1.11/share/em_armgcc/bin/../lib/gcc/arm-none-eabi/5.4.1/armv6-m/crtbegin.o
 
 .fs_data        0x200024f8        0x0
@@ -4746,7 +4746,7 @@ END GROUP
  *(.fs_data)
                 0x200024f8                PROVIDE (__stop_fs_data, .)
 
-.bss            0x200024f8      0xb54 load address 0x0002ed14
+.bss            0x200024f8      0xb54 load address 0x0002ed20
                 0x200024f8                . = ALIGN (0x4)
                 0x200024f8                __bss_start__ = .
  *(.bss*)
@@ -5572,7 +5572,7 @@ OUTPUT(bin\Debug\RingP.elf elf32-littlearm)
  .debug_ranges  0x00004218       0x28 obj\debug\source\app\main.o
  .debug_ranges  0x00004240       0x60 obj\debug\source\gpio\gpio_hal.o
 
-.debug_line     0x00000000     0xfdae
+.debug_line     0x00000000     0xfdaf
  .debug_line    0x00000000      0xcf8 obj\debug\components\ble\ble_advertising\ble_advertising.o
  .debug_line    0x00000cf8      0x858 obj\debug\components\ble\ble_services\ble_bas\ble_bas.o
  .debug_line    0x00001550      0x7de obj\debug\components\ble\ble_services\ble_dis\ble_dis.o
@@ -5610,8 +5610,8 @@ OUTPUT(bin\Debug\RingP.elf elf32-littlearm)
  .debug_line    0x0000e25f      0x1da obj\debug\components\toolchain\system_nrf51.o
  .debug_line    0x0000e439      0x686 obj\debug\source\adc\adc_hal.o
  .debug_line    0x0000eabf      0xf6d obj\debug\source\app\ble_stack.o
- .debug_line    0x0000fa2c      0x168 obj\debug\source\app\main.o
- .debug_line    0x0000fb94      0x21a obj\debug\source\gpio\gpio_hal.o
+ .debug_line    0x0000fa2c      0x169 obj\debug\source\app\main.o
+ .debug_line    0x0000fb95      0x21a obj\debug\source\gpio\gpio_hal.o
 
 .debug_str      0x00000000     0xbb24
  .debug_str     0x00000000     0x3aaa obj\debug\components\ble\ble_advertising\ble_advertising.o
