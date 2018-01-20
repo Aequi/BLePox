@@ -1,3 +1,5 @@
 bin>openocd.exe -f interface/stlink-v2.cfg -f target/nrf51.cfg
+
+halt
 nrf51 mass_erase
-flash write_image erase File_name.bin
+flash write_image erase RingPwithSoftdevice.bin
