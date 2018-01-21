@@ -26,7 +26,7 @@ static void onAdcDataReady(void)
 {
     if (isAdcDataReady && isSendActive) {
         isOverrun = true;
-        gpioLedOnRed(false);
+//        gpioLedOnRed(false);
     }
     isAdcDataReady = true;
 }

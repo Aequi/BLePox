@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
 	<ActiveTarget name="Debug" />
+	<File name="components\ble\ble_advertising\ble_advertising.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="448" topLine="15" />
+		</Cursor>
+	</File>
 	<File name="components\drivers_nrf\adc\nrf_drv_adc.c" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="7159" topLine="104" />
@@ -21,9 +26,9 @@
 			<Cursor1 position="835" topLine="147" />
 		</Cursor>
 	</File>
-	<File name="components\drivers_nrf\config\nrf_drv_config_validation.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="components\drivers_nrf\config\nrf_drv_config_validation.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1072" topLine="36" />
+			<Cursor1 position="1894" topLine="36" />
 		</Cursor>
 	</File>
 	<File name="components\drivers_nrf\delay\nrf_delay.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -36,9 +41,29 @@
 			<Cursor1 position="4159" topLine="195" />
 		</Cursor>
 	</File>
+	<File name="components\drivers_nrf\gpiote\nrf_drv_gpiote.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1240" topLine="31" />
+		</Cursor>
+	</File>
 	<File name="components\drivers_nrf\hal\nrf_gpio.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="6104" topLine="192" />
+		</Cursor>
+	</File>
+	<File name="components\drivers_nrf\hal\nrf_gpiote.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1096" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="components\drivers_nrf\twi_master\nrf_drv_twi.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="24485" topLine="716" />
+		</Cursor>
+	</File>
+	<File name="components\drivers_nrf\twi_master\nrf_drv_twi.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11059" topLine="247" />
 		</Cursor>
 	</File>
 	<File name="components\libraries\scheduler\app_scheduler.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -56,9 +81,9 @@
 			<Cursor1 position="7351" topLine="151" />
 		</Cursor>
 	</File>
-	<File name="components\libraries\util\nordic_common.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="components\libraries\util\nordic_common.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1420" topLine="61" />
+			<Cursor1 position="1550" topLine="16" />
 		</Cursor>
 	</File>
 	<File name="components\softdevice\s130\headers\nrf_sdm.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -71,12 +96,12 @@
 			<Cursor1 position="32900" topLine="652" />
 		</Cursor>
 	</File>
-	<File name="components\toolchain\gcc\gcc_startup_nrf51.s" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="components\toolchain\gcc\gcc_startup_nrf51.s" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="7798" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="source\adc\adc_hal.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="source\adc\adc_hal.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="246" topLine="0" />
 		</Cursor>
@@ -86,7 +111,7 @@
 			<Cursor1 position="142" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="source\app\ble_stack.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="source\app\ble_stack.c" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="39347" topLine="876" />
 		</Cursor>
@@ -96,24 +121,34 @@
 			<Cursor1 position="401" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="source\app\main.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="source\app\main.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1130" topLine="10" />
+			<Cursor1 position="628" topLine="4" />
 		</Cursor>
 	</File>
-	<File name="source\app\nrf_drv_config.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="source\app\nrf_drv_config.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3953" topLine="90" />
+			<Cursor1 position="6629" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="source\gpio\gpio_hal.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="source\gpio\gpio_hal.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="294" topLine="0" />
+			<Cursor1 position="54" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="source\gpio\gpio_hal.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="158" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="source\I2cPox\I2cPox.c" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2656" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="source\I2cPox\I2cPox.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="93" topLine="0" />
 		</Cursor>
 	</File>
 </EmBitz_layout_file>

@@ -204,7 +204,7 @@
 #define PWM_COUNT   (PWM0_ENABLED + PWM1_ENABLED + PWM2_ENABLED)
 
 /* SPI */
-#define SPI0_ENABLED 1
+#define SPI0_ENABLED 0
 
 #if (SPI0_ENABLED == 1)
 #define SPI0_USE_EASY_DMA 1
@@ -301,7 +301,7 @@
 #endif //NRF52
 #endif
 
-#define TWI0_ENABLED 0
+#define TWI0_ENABLED 1
 
 #if (TWI0_ENABLED == 1)
 #define TWI0_USE_EASY_DMA 0
@@ -314,7 +314,7 @@
 #define TWI0_INSTANCE_INDEX      0
 #endif
 
-#define TWI1_ENABLED 0
+#define TWI1_ENABLED 1
 
 #if (TWI1_ENABLED == 1)
 #define TWI1_USE_EASY_DMA 0
