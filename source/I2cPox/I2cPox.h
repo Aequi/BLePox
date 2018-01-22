@@ -10,4 +10,16 @@ void i2cPoxInit(I2cPoxIntCallback i2cIntCb);
 uint8_t i2cPoxReadReg(uint8_t address);
 void i2cPoxWriteReg(uint8_t address, uint8_t byte);
 
+uint8_t i2cPoxReadIntStatus(void);
+uint8_t i2cPoxReadReadPtr(void);
+uint8_t i2cPoxReadOvrPtr(void);
+uint8_t i2cPoxReadWritePtr(void);
+void i2cPoxWriteReadPtr(uint8_t val);
+void i2cPoxWriteOvrPtr(uint8_t val);
+void i2cPoxWriteWritePtr(uint8_t val);
+
+void i2cPoxReadData(uint8_t samples[], uint32_t count);
+void i2cPoxTriggerTemp(void);
+void i2cPoxReadTemp(uint8_t temp[]);
+
 #endif

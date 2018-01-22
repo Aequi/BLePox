@@ -8,12 +8,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TWI_SCL_PIN         2
-#define TWI_SDA_PIN         3
-#define INT_PIN             4
+#define TWI_SCL_PIN         15
+#define TWI_SDA_PIN         16
+#define INT_PIN             17
 #define I2C_INSTANCE        0
-#define POX_ADDRESS         0xAE
-#define I2C_POX_BUFF_SIZE   32
+#define POX_ADDRESS         (0xAE >> 1)
+#define I2C_POX_BUFF_SIZE   256
 
 static const nrf_drv_twi_t m_twi_master = NRF_DRV_TWI_INSTANCE(I2C_INSTANCE);
 static I2cPoxIntCallback i2cPoxIntCallback = NULL;
@@ -60,6 +60,11 @@ void i2cPoxWriteReg(uint8_t address, uint8_t byte)
 void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
 {
     i2cPoxIntCallback = i2cPoxIntCb;
+
+    nrf_gpio_pin_dir_set(TWI_SCL_PIN, NRF_GPIO_PIN_DIR_INPUT);
+    nrf_gpio_pin_dir_set(TWI_SDA_PIN, NRF_GPIO_PIN_DIR_INPUT);
+    nrf_gpio_cfg_input(INT_PIN, NRF_GPIO_PIN_PULLUP);
+
     const nrf_drv_twi_config_t twiConfig = {
        .scl                = TWI_SCL_PIN,
        .sda                = TWI_SDA_PIN,
@@ -74,12 +79,13 @@ void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
         .sense = NRF_GPIOTE_POLARITY_HITOLO,
     };
 
-    nrf_drv_gpiote_init();
+    if (!nrf_drv_gpiote_is_init()) {
+        nrf_drv_gpiote_init();
+    }
     nrf_drv_gpiote_in_init(INT_PIN, &gpioteConfig, intEventHandler);
-
     nrf_drv_gpiote_in_event_enable(INT_PIN, true);
-    nrf_drv_twi_init(&m_twi_master, &twiConfig, NULL, NULL);
 
+    nrf_drv_twi_init(&m_twi_master, &twiConfig, NULL, NULL);
     nrf_drv_twi_enable(&m_twi_master);
 
     uint8_t id = i2cPoxReadReg(0xFF);
@@ -90,6 +96,56 @@ void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
     i2cPoxWriteReg(0x06, 0x03); // SPO2 mode
     i2cPoxWriteReg(0x07, 0x47); // 16 bit, 100sps
     i2cPoxWriteReg(0x09, 0x33); // SPO2 mode
-    i2cPoxWriteReg(0x01, 0x0F); // Enable interrupts
+    i2cPoxWriteReg(0x01, 0xF0); // Enable interrupts
 }
 
+
+uint8_t i2cPoxReadIntStatus(void)
+{
+    return i2cPoxReadReg(0x00);
+}
+
+uint8_t i2cPoxReadReadPtr(void)
+{
+    return i2cPoxReadReg(0x02);
+}
+
+uint8_t i2cPoxReadOvrPtr(void)
+{
+    return i2cPoxReadReg(0x03);
+}
+
+uint8_t i2cPoxReadWritePtr(void)
+{
+    return i2cPoxReadReg(0x04);
+}
+
+void i2cPoxWriteReadPtr(uint8_t val)
+{
+    i2cPoxWriteReg(0x02, val);
+}
+
+void i2cPoxWriteOvrPtr(uint8_t val)
+{
+    i2cPoxWriteReg(0x03, val);
+}
+
+void i2cPoxWriteWritePtr(uint8_t val)
+{
+    i2cPoxWriteReg(0x04, val);
+}
+
+void i2cPoxReadData(uint8_t samples[], uint32_t count)
+{
+    return i2cRead(0x05, samples, count * 4);
+}
+
+void i2cPoxTriggerTemp(void)
+{
+    i2cPoxWriteReg(0x06, 0x0B);
+}
+
+void i2cPoxReadTemp(uint8_t temp[])
+{
+    return i2cRead(0x16, temp, 2);
+}
