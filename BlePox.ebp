@@ -3,12 +3,12 @@
 	<EmBitzVersion release="1.11" revision="0" />
 	<FileVersion major="1" minor="0" />
 	<Project>
-		<Option title="RingP" />
+		<Option title="BlePox" />
 		<Option pch_mode="2" />
 		<Option compiler="armgcc_eb" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\Debug\RingP.elf" />
+				<Option output="bin\Debug\BlePox.elf" />
 				<Option object_output="obj\Debug\" />
 				<Option type="0" />
 				<Option create_hex="1" />
@@ -19,14 +19,14 @@
 					<Add option="-g2" />
 				</Compiler>
 				<ExtraCommands>
-					<Add after="mergehex -m components\softdevice\s130\hex\s130_nrf51_2.0.0_softdevice.hex bin\Debug\RingP.hex  -o bin\Debug\RingPwithSoftdevice.hex" />
-					<Add after="arm-none-eabi-objcopy -I ihex bin\Debug\RingPwithSoftdevice.hex -O binary bin\Debug\RingPwithSoftdevice.bin" />
+					<Add after="mergehex -m components\softdevice\s130\hex\s130_nrf51_2.0.0_softdevice.hex bin\Debug\BlePox.hex  -o bin\Debug\BlePoxSd.hex" />
+					<Add after="arm-none-eabi-objcopy -I ihex bin\Debug\BlePoxSd.hex -O binary bin\Debug\BlePoxSd.bin" />
 					<Mode before="0" />
 					<Mode after="2" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\Release\Mouse_NordicGzllBluetooth.elf" />
+				<Option output="bin\Release\BlePox.elf" />
 				<Option object_output="obj\Release\" />
 				<Option type="0" />
 				<Option create_hex="1" />
@@ -42,8 +42,8 @@
 					<Add option="-Wl,--gc-sections" />
 				</Linker>
 				<ExtraCommands>
-					<Add after="..\..\utils\mergehex -m components\softdevice\s130\hex\s130_nrf51_2.0.0_softdevice.hex bin\Release\Mouse_NordicGzllBluetooth.hex  -o bin\Release\Mouse_NordicGzllBluetoothWithSoftdevice.hex" />
-					<Add after="arm-none-eabi-objcopy -I ihex bin\Release\Mouse_NordicGzllBluetoothWithSoftdevice.hex -O binary bin\Release\Mouse_NordicGzllBluetoothWithSoftdevice.bin" />
+					<Add after="mergehex -m components\softdevice\s130\hex\s130_nrf51_2.0.0_softdevice.hex bin\Release\BlePox.hex  -o bin\Release\BlePoxSd.hex" />
+					<Add after="arm-none-eabi-objcopy -I ihex bin\Release\BlePoxSd.hex -O binary bin\Release\BlePoxSd.bin" />
 					<Mode before="0" />
 					<Mode after="2" />
 				</ExtraCommands>
