@@ -65,7 +65,7 @@
 #define UART_TX_BUF_SIZE                256                                        /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE                1                                          /**< UART RX buffer size. */
 
-#define DEVICE_NAME                     "RingP"                                    /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "BlePox"                                    /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "NordicSemiconductor"                      /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define APP_TIMER_PRESCALER             0                                          /**< Value of the RTC1 PRESCALER register. */

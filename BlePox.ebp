@@ -259,6 +259,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="components\toolchain\system_nrf51.h" />
+		<Unit filename="linker\ble_app_hids_mouse_gcc_nrf51.ld" />
 		<Unit filename="source\adc\adc_hal.c">
 			<Option compilerVar="CC" />
 		</Unit>

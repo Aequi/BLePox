@@ -22,4 +22,6 @@ void i2cPoxReadData(uint8_t samples[], uint32_t count);
 void i2cPoxTriggerTemp(void);
 void i2cPoxReadTemp(uint8_t temp[]);
 
+bool i2cPoxGetIntStatus(void);
+
 #endif

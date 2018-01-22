@@ -93,12 +93,30 @@ void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
         volatile bool ok = true;
     }
 
+    i2cPoxWriteReg(0x06, 0x40); // Reset
+    while (i2cPoxReadReg(0x00) & 0x01) {
+    }
+/*
+    i2cPoxWriteReg(0x02, 0x00);
+    i2cPoxWriteReg(0x03, 0x00);
+    i2cPoxWriteReg(0x04, 0x00);
+    i2cPoxReadReg(0x00);
+*/
     i2cPoxWriteReg(0x06, 0x03); // SPO2 mode
+    i2cPoxWriteReg(0x09, 0x33); // 11 mA current
     i2cPoxWriteReg(0x07, 0x47); // 16 bit, 100sps
-    i2cPoxWriteReg(0x09, 0x33); // SPO2 mode
-    i2cPoxWriteReg(0x01, 0xF0); // Enable interrupts
+    i2cPoxWriteReg(0x01, 0x10); // Enable interrupts
+
+    i2cPoxWriteReg(0x02, 0x00);
+    i2cPoxWriteReg(0x03, 0x00);
+    i2cPoxWriteReg(0x04, 0x00);
+    i2cPoxReadReg(0x00);
 }
 
+bool i2cPoxGetIntStatus(void)
+{
+    return ((bool) !nrf_gpio_pin_read(INT_PIN));
+}
 
 uint8_t i2cPoxReadIntStatus(void)
 {
@@ -107,7 +125,7 @@ uint8_t i2cPoxReadIntStatus(void)
 
 uint8_t i2cPoxReadReadPtr(void)
 {
-    return i2cPoxReadReg(0x02);
+    return i2cPoxReadReg(0x04);
 }
 
 uint8_t i2cPoxReadOvrPtr(void)
@@ -117,12 +135,12 @@ uint8_t i2cPoxReadOvrPtr(void)
 
 uint8_t i2cPoxReadWritePtr(void)
 {
-    return i2cPoxReadReg(0x04);
+    return i2cPoxReadReg(0x02);
 }
 
 void i2cPoxWriteReadPtr(uint8_t val)
 {
-    i2cPoxWriteReg(0x02, val);
+    i2cPoxWriteReg(0x04, val);
 }
 
 void i2cPoxWriteOvrPtr(uint8_t val)
@@ -132,7 +150,7 @@ void i2cPoxWriteOvrPtr(uint8_t val)
 
 void i2cPoxWriteWritePtr(uint8_t val)
 {
-    i2cPoxWriteReg(0x04, val);
+    i2cPoxWriteReg(0x02, val);
 }
 
 void i2cPoxReadData(uint8_t samples[], uint32_t count)
