@@ -6,8 +6,13 @@
 #include "I2cPox.h"
 
 #define BLE_HID_REPORT_SEND_RETRY_COUNT     200
-static uint8_t poxData[19];
+
 static volatile bool isAdcDataReady = false, isSendActive = false, isOverrun = false;
+static uint32_t wrPtr = 0, rdPtr = 0, ovr = 0;
+static uint8_t poxData[19];
+static uint8_t ringBuffData[256];
+static uint32_t wrPtrB = 0;
+static uint32_t rdPtrB = 0;
 
 static void onBleHidReportReceived(const uint8_t report[], uint32_t length)
 {
@@ -22,18 +27,9 @@ static void onBleHidReportReceived(const uint8_t report[], uint32_t length)
         isSendActive = false;
     }
 }
-/*
-static void onAdcDataReady(void)
-{
-    if (isAdcDataReady && isSendActive) {
-        isOverrun = true;
-//        gpioLedOnRed(false);
-    }
-    isAdcDataReady = true;
-}
-*/
 
-static bool isPoxInt = false;
+
+static volatile bool isPoxInt = false;
 
 static void poxCb(void)
 {
@@ -46,43 +42,24 @@ static void NRF_SwitchToBleMode(bool eraseBonds)
     NRF_BleStart(eraseBonds);
 }
 
-static uint32_t wrPtr = 0, rdPtr = 0, ovr = 0;
-
 int main(void)
 {
     gpioHalInit();
-    //adcHalInit(onAdcDataReady);
-
     nrf_delay_ms(1000);
-    //gpioPwrOn(true);
-    //while (gpioHalReadButton());
     scheduler_init();
-    NRF_SwitchToBleMode(true);
+    NRF_SwitchToBleMode(false);
     i2cPoxInit(poxCb);
-    uint32_t cntr = 0;
-    for (;;) {
-        /*
-        if (isAdcDataReady && isSendActive) {
-            for (uint32_t i = 0; i < BLE_HID_REPORT_SEND_RETRY_COUNT; i++) {
-                if (NRF_BleSendHidReport(adcGetData(), BLE_HID_CUSTOM_REPORT_SIZE)) {
-                    isAdcDataReady = false;
-                    break;
-                }
-            }
-        }
-        */
 
+    static uint32_t poxIntCntr = 0;
+    static uint8_t temp[2] = {0, 0};
+    uint32_t delta = 0;
+    uint32_t delta2 = 0;
+    uint32_t cntr = 0;
+
+    for (;;) {
         if (isPoxInt || i2cPoxGetIntStatus()) {
 
-            static uint8_t samples[64];
-            static uint32_t poxIntCntr = 0;
-            static uint32_t sampleCntr = 0;
-            bool isPoxDataReady = false;
-            static uint8_t temp[2] = {0, 0};
-            uint32_t delta = 0;
-            static uint8_t poxIntStatus = 0;
-            static bool blink = true;
-            poxIntStatus = i2cPoxReadIntStatus();
+            i2cPoxReadIntStatus();
             rdPtr = i2cPoxReadReadPtr();
             wrPtr = i2cPoxReadWritePtr();
             ovr = i2cPoxReadOvrPtr();
@@ -93,48 +70,57 @@ int main(void)
                     delta = wrPtr - rdPtr;
                 }
 
-                i2cPoxReadData(&samples[sampleCntr * 4], delta);
-                sampleCntr += delta;
-                if (sampleCntr == 4) {
-                    uint32_t bCntr = 0;
-                    for (bCntr = 0; bCntr < 16; bCntr++) {
-                        poxData[bCntr] = samples[bCntr];
-                    }
-                    sampleCntr = 0;
-                    if (isPoxDataReady) {
-                        blink = !blink;
-                        gpioLedOnRed(blink);
-                    }
-                    isPoxDataReady = true;
-                } else if (sampleCntr > 4) {
-                    blink = !blink;
-                    gpioLedOnRed(blink);
-                    sampleCntr = 0;
+                i2cPoxReadData(&ringBuffData[wrPtrB], delta);
+                wrPtrB += delta * 4;
+                if (wrPtrB >= 256) {
+                    wrPtrB = 0;
                 }
             }
 
-            if (poxIntCntr++ == 300) {
+            if (poxIntCntr++ == 10000) {
                 i2cPoxTriggerTemp();
             }
 
-            if (poxIntCntr == 600) {
+            if (poxIntCntr == 20000) {
                 i2cPoxReadTemp(temp);
                 poxIntCntr = 0;
             }
 
-            if (isPoxDataReady) {
-                poxData[16] = temp[0];
-                poxData[17] = temp[1];
-                if (isSendActive) {
-                    if (NRF_BleSendHidReport(poxData, BLE_HID_CUSTOM_REPORT_SIZE)) {
-                        isPoxDataReady = false;
-                    }
-                    poxData[18]++;
-                }
+            isPoxInt = false;
+        }
+        delta2 = 0;
+        if (rdPtrB != wrPtrB) {
+            if (rdPtrB > wrPtrB) {
+                delta2 = 256 - rdPtrB + wrPtrB;
+            } else {
+                delta2 = wrPtrB - rdPtrB;
+            }
+        }
 
+        if (delta2 >= 16) {
+            uint32_t bCntr = 0;
+            for (bCntr = 0; bCntr < 16; bCntr++) {
+                poxData[bCntr] = ringBuffData[rdPtrB++];
+                if (rdPtrB >= 256)
+                    rdPtrB = 0;
             }
 
-            isPoxInt = false;
+            poxData[16] = temp[0];
+            poxData[17] = temp[1];
+
+            if (isSendActive) {
+                if (!NRF_BleSendHidReport(poxData, BLE_HID_CUSTOM_REPORT_SIZE)) {
+                    if (!NRF_BleSendHidReport(poxData, BLE_HID_CUSTOM_REPORT_SIZE)) {
+                        if (!NRF_BleSendHidReport(poxData, BLE_HID_CUSTOM_REPORT_SIZE)) {
+                            if (!NRF_BleSendHidReport(poxData, BLE_HID_CUSTOM_REPORT_SIZE)) {
+
+                            }
+                        }
+                    }
+                }
+                poxData[18]++;
+            }
+
         }
 
         if (cntr == 10000) {

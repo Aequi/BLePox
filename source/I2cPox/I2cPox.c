@@ -88,22 +88,13 @@ void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
     nrf_drv_twi_init(&m_twi_master, &twiConfig, NULL, NULL);
     nrf_drv_twi_enable(&m_twi_master);
 
-    uint8_t id = i2cPoxReadReg(0xFF);
-    if (id == 0x11) {
-        volatile bool ok = true;
-    }
-
     i2cPoxWriteReg(0x06, 0x40); // Reset
     while (i2cPoxReadReg(0x00) & 0x01) {
+
     }
-/*
-    i2cPoxWriteReg(0x02, 0x00);
-    i2cPoxWriteReg(0x03, 0x00);
-    i2cPoxWriteReg(0x04, 0x00);
-    i2cPoxReadReg(0x00);
-*/
+
     i2cPoxWriteReg(0x06, 0x03); // SPO2 mode
-    i2cPoxWriteReg(0x09, 0x33); // 11 mA current
+    i2cPoxWriteReg(0x09, 0x77); // 24 mA current
     i2cPoxWriteReg(0x07, 0x47); // 16 bit, 100sps
     i2cPoxWriteReg(0x01, 0x10); // Enable interrupts
 

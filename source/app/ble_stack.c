@@ -197,7 +197,7 @@ static void gap_params_init(void)
                                           strlen(DEVICE_NAME));
     APP_ERROR_CHECK(err_code);
 
-    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_HID_MOUSE);
+    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_PULSE_OXIMETER_WRIST_WORN);
     APP_ERROR_CHECK(err_code);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
@@ -270,24 +270,6 @@ static void hids_init(void)
     memset(inp_rep_array, 0, sizeof(inp_rep_array));
     // Initialize HID Service.
 
-/*    p_input_report                      = &inp_rep_array[INPUT_REP_BUTTONS_MOVEMENT_IDX];
-    p_input_report->max_len             = INPUT_REP_BUTTONS_MOVEMENT_LEN;
-    p_input_report->rep_ref.report_id   = 0x01;
-    p_input_report->rep_ref.report_type = BLE_HIDS_REP_TYPE_INPUT;
-
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.write_perm);
-
-    p_input_report                      = &inp_rep_array[INPUT_REP_MPLAYER_IDX];
-    p_input_report->max_len             = INPUT_REP_MEDIA_PLAYER_LEN;
-    p_input_report->rep_ref.report_id   = 0x02;
-    p_input_report->rep_ref.report_type = BLE_HIDS_REP_TYPE_INPUT;
-
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.cccd_write_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_ENC_NO_MITM(&p_input_report->security_mode.write_perm);
-*/
     p_input_report                      = &inp_rep_array[INPUT_REP_CUSTOM_IDX];
     p_input_report->max_len             = INPUT_REP_CUSTOM_LEN;
     p_input_report->rep_ref.report_id   = 0x0E;
