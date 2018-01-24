@@ -47,7 +47,7 @@ int main(void)
     gpioHalInit();
     nrf_delay_ms(1000);
     scheduler_init();
-    NRF_SwitchToBleMode(false);
+    NRF_SwitchToBleMode(true);
     i2cPoxInit(poxCb);
 
     static uint32_t poxIntCntr = 0;
@@ -69,11 +69,19 @@ int main(void)
                 } else {
                     delta = wrPtr - rdPtr;
                 }
+                while (delta--) {
+                    uint8_t data[4];
+                    i2cPoxReadData(data, 1);
 
-                i2cPoxReadData(&ringBuffData[wrPtrB], delta);
-                wrPtrB += delta * 4;
-                if (wrPtrB >= 256) {
-                    wrPtrB = 0;
+                    //i2cPoxReadData(&ringBuffData[wrPtrB], delta);
+                    ringBuffData[wrPtrB++] = data[0];
+                    ringBuffData[wrPtrB++] = data[1];
+                    ringBuffData[wrPtrB++] = data[2];
+                    ringBuffData[wrPtrB++] = data[3];
+
+                    if (wrPtrB >= 256) {
+                        wrPtrB = 0;
+                    }
                 }
             }
 

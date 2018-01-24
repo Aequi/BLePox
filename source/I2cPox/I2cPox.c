@@ -94,7 +94,7 @@ void i2cPoxInit(I2cPoxIntCallback i2cPoxIntCb)
     }
 
     i2cPoxWriteReg(0x06, 0x03); // SPO2 mode
-    i2cPoxWriteReg(0x09, 0x77); // 24 mA current
+    i2cPoxWriteReg(0x09, 0xA7); // 24 mA current
     i2cPoxWriteReg(0x07, 0x47); // 16 bit, 100sps
     i2cPoxWriteReg(0x01, 0x10); // Enable interrupts
 
