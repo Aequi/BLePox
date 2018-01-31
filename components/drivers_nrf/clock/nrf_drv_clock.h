@@ -1,13 +1,41 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2016 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 #ifndef NRF_DRV_CLOCK_H__
@@ -18,18 +46,22 @@
 #include "sdk_errors.h"
 #include "nrf_assert.h"
 #include "nrf_clock.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
 #include "nrf_drv_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  *
  * @addtogroup nrf_clock Clock HAL and driver
  * @ingroup nrf_drivers
  * @brief Clock APIs.
- * @details The clock HAL provides basic APIs for accessing the registers of the clock. 
+ * @details The clock HAL provides basic APIs for accessing the registers of the clock.
  * The clock driver provides APIs on a higher level.
  *
- * @defgroup nrf_clock_drv Clock driver
+ * @defgroup nrf_drv_clock Clock driver
  * @{
  * @ingroup nrf_clock
  * @brief Driver for managing the low-frequency clock (LFCLK) and the high-frequency clock (HFCLK).
@@ -63,13 +95,23 @@ struct nrf_drv_clock_handler_item_s
 };
 
 /**
+ * @brief Function for checking if driver is already initialized
+ *
+ * This function is used to check whatever common POWER_CLOCK common interrupt
+ * should be disabled or not if @ref nrf_drv_power tries to disable the interrupt.
+ *
+ * @retval true  Driver is initialized
+ * @retval false Driver is uninitialized
+ */
+bool nrf_drv_clock_init_check(void);
+
+/**
  * @brief Function for initializing the nrf_drv_clock module.
  *
  * After initialization, the module is in power off state (clocks are not requested).
  *
- * @retval     NRF_SUCCESS                        If the procedure was successful.
- * @retval     MODULE_ALREADY_INITIALIZED         If the driver was already initialized.
- * @retval     NRF_ERROR_SOFTDEVICE_NOT_ENABLED   If the SoftDevice was not enabled.
+ * @retval     NRF_SUCCESS                           If the procedure was successful.
+ * @retval     NRF_ERROR_MODULE_ALREADY_INITIALIZED  If the driver was already initialized.
  */
 ret_code_t nrf_drv_clock_init(void);
 
@@ -80,8 +122,8 @@ ret_code_t nrf_drv_clock_init(void);
 void nrf_drv_clock_uninit(void);
 
 /**
- * @brief Function for requesting the LFCLK. 
- * 
+ * @brief Function for requesting the LFCLK.
+ *
  * The low-frequency clock can be requested by different modules
  * or contexts. The driver ensures that the clock will be started only when it is requested
  * the first time. If the clock is not ready but it was already started, the handler item that is
@@ -90,7 +132,7 @@ void nrf_drv_clock_uninit(void);
  * current context.
  *
  * The first request will start the selected LFCLK source. If an event handler is
- * provided, it will be called once the LFCLK is started. If the LFCLK was already started at this 
+ * provided, it will be called once the LFCLK is started. If the LFCLK was already started at this
  * time, the event handler will be called from the context of this function. Additionally,
  * the @ref nrf_drv_clock_lfclk_is_running function can be polled to check if the clock has started.
  *
@@ -103,7 +145,7 @@ void nrf_drv_clock_uninit(void);
 void nrf_drv_clock_lfclk_request(nrf_drv_clock_handler_item_t * p_handler_item);
 
 /**
- * @brief Function for releasing the LFCLK. 
+ * @brief Function for releasing the LFCLK.
  *
  * If there are no more requests, the LFCLK source will be stopped.
  *
@@ -120,9 +162,9 @@ void nrf_drv_clock_lfclk_release(void);
 bool nrf_drv_clock_lfclk_is_running(void);
 
 /**
- * @brief Function for requesting the high-accuracy source HFCLK. 
+ * @brief Function for requesting the high-accuracy source HFCLK.
  *
- * The high-accuracy source 
+ * The high-accuracy source
  * can be requested by different modules or contexts. The driver ensures that the high-accuracy
  * clock will be started only when it is requested the first time. If the clock is not ready
  * but it was already started, the handler item that is provided as an input parameter is added
@@ -141,7 +183,7 @@ bool nrf_drv_clock_lfclk_is_running(void);
 void nrf_drv_clock_hfclk_request(nrf_drv_clock_handler_item_t * p_handler_item);
 
 /**
- * @brief Function for releasing the high-accuracy source HFCLK. 
+ * @brief Function for releasing the high-accuracy source HFCLK.
  *
  * If there are no more requests, the high-accuracy source will be released.
  */
@@ -192,7 +234,7 @@ ret_code_t nrf_drv_clock_calibration_start(uint8_t delay, nrf_drv_clock_event_ha
 ret_code_t nrf_drv_clock_calibration_abort(void);
 
 /**
- * @brief Function for checking if calibration is in progress. 
+ * @brief Function for checking if calibration is in progress.
  *
  * This function indicates that the system is
  * in calibration if it is in any of the calibration process phases (see @ref nrf_drv_clock_calibration_start).
@@ -220,11 +262,33 @@ __STATIC_INLINE uint32_t nrf_drv_clock_ppi_task_addr(nrf_clock_task_t task);
  */
 __STATIC_INLINE uint32_t nrf_drv_clock_ppi_event_addr(nrf_clock_event_t event);
 
+
+#ifdef SOFTDEVICE_PRESENT
 /**
  * @brief Function called by the SoftDevice handler if an @ref nrf_soc event is received from the SoftDevice.
+ *
+ * @param[in] evt_id One of NRF_SOC_EVTS values.
  */
-#ifdef SOFTDEVICE_PRESENT
 void nrf_drv_clock_on_soc_event(uint32_t evt_id);
+
+/**
+ * @brief Function called by the SoftDevice handler when the SoftDevice has been enabled.
+ *
+ * This function is called just after the SoftDevice has been properly enabled.
+ * Its main purpose is to mark that LFCLK has been requested by SD.
+ */
+void nrf_drv_clock_on_sd_enable(void);
+
+/**
+ * @brief Function called by the SoftDevice handler when the SoftDevice has been disabled.
+ *
+ * This function is called just after the SoftDevice has been properly disabled.
+ * It has two purposes:
+ * 1. Releases the LFCLK from the SD.
+ * 2. Reinitializes an interrupt after the SD releases POWER_CLOCK_IRQ.
+ */
+void nrf_drv_clock_on_sd_disable(void);
+
 #endif
 /**
  *@}
@@ -243,4 +307,9 @@ __STATIC_INLINE uint32_t nrf_drv_clock_ppi_event_addr(nrf_clock_event_t event)
 #endif //SUPPRESS_INLINE_IMPLEMENTATION
 
 /*lint --flb "Leave library region" */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NRF_CLOCK_H__

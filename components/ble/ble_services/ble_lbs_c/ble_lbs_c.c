@@ -1,23 +1,52 @@
-/*
- * Copyright (c) 2012 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is confidential property of Nordic Semiconductor. The use,
- * copying, transfer or disclosure of such information is prohibited except by express written
- * agreement with Nordic Semiconductor.
- *
+/**
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
-
+#include "sdk_common.h"
+#if NRF_MODULE_ENABLED(BLE_LBS_C)
 
 #include "ble_lbs_c.h"
 #include "ble_db_discovery.h"
 #include "ble_types.h"
 #include "ble_srv_common.h"
 #include "ble_gattc.h"
-#include "app_trace.h"
-#include "sdk_common.h"
+#define NRF_LOG_MODULE_NAME "BLE_LBS_C"
 #include "nrf_log.h"
-
-#define LOG                    NRF_LOG_PRINTF_DEBUG  /**< Debug logger macro that will be used in this file to do logging of important information over UART. */
 
 #define TX_BUFFER_MASK         0x07                  /**< TX Buffer mask, must be a mask of continuous zeroes, followed by continuous sequence of ones: 000...111. */
 #define TX_BUFFER_SIZE         (TX_BUFFER_MASK + 1)  /**< Size of send buffer, which is 1 higher than the mask. */
@@ -79,13 +108,13 @@ static void tx_buffer_process(void)
         }
         if (err_code == NRF_SUCCESS)
         {
-            LOG("[LBS_C]: SD Read/Write API returns Success..\r\n");
+            NRF_LOG_DEBUG("SD Read/Write API returns Success..\r\n");
             m_tx_index++;
             m_tx_index &= TX_BUFFER_MASK;
         }
         else
         {
-            LOG("[LBS_C]: SD Read/Write API returns error. This message sending will be "
+            NRF_LOG_DEBUG("SD Read/Write API returns error. This message sending will be "
                 "attempted again..\r\n");
         }
     }
@@ -179,7 +208,7 @@ void ble_lbs_on_db_disc_evt(ble_lbs_c_t * p_ble_lbs_c, const ble_db_discovery_ev
         for (i = 0; i < p_evt->params.discovered_db.char_count; i++)
         {
             const ble_gatt_db_char_t * p_char = &(p_evt->params.discovered_db.charateristics[i]);
-            switch(p_char->characteristic.uuid.uuid)
+            switch (p_char->characteristic.uuid.uuid)
             {
                 case LBS_UUID_LED_CHAR:
                     evt.params.peer_db.led_handle = p_char->characteristic.handle_value;
@@ -194,9 +223,9 @@ void ble_lbs_on_db_disc_evt(ble_lbs_c_t * p_ble_lbs_c, const ble_db_discovery_ev
             }
         }
 
-        LOG("[LBS_C]: Led Button Service discovered at peer.\r\n");
+        NRF_LOG_DEBUG("Led Button Service discovered at peer.\r\n");
         //If the instance has been assigned prior to db_discovery, assign the db_handles
-        if(p_ble_lbs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
+        if (p_ble_lbs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
         {
             if ((p_ble_lbs_c->peer_lbs_db.led_handle         == BLE_GATT_HANDLE_INVALID)&&
                 (p_ble_lbs_c->peer_lbs_db.button_handle      == BLE_GATT_HANDLE_INVALID)&&
@@ -269,7 +298,7 @@ void ble_lbs_c_on_ble_evt(ble_lbs_c_t * p_ble_lbs_c, const ble_evt_t * p_ble_evt
 
 
 /**@brief Function for configuring the CCCD.
- * 
+ *
  * @param[in] conn_handle The connection handle on which to configure the CCCD.
  * @param[in] handle_cccd The handle of the CCCD to be configured.
  * @param[in] enable      Whether to enable or disable the CCCD.
@@ -278,7 +307,7 @@ void ble_lbs_c_on_ble_evt(ble_lbs_c_t * p_ble_lbs_c, const ble_evt_t * p_ble_evt
  */
 static uint32_t cccd_configure(uint16_t conn_handle, uint16_t handle_cccd, bool enable)
 {
-    LOG("[LBS_C]: Configuring CCCD. CCCD Handle = %d, Connection Handle = %d\r\n",
+    NRF_LOG_DEBUG("Configuring CCCD. CCCD Handle = %d, Connection Handle = %d\r\n",
         handle_cccd,conn_handle);
 
     tx_message_t * p_msg;
@@ -326,7 +355,7 @@ uint32_t ble_lbs_led_status_send(ble_lbs_c_t * p_ble_lbs_c, uint8_t status)
         return NRF_ERROR_INVALID_STATE;
     }
 
-    LOG("[LBS_C]: writing LED status 0x%x", status);
+    NRF_LOG_DEBUG("writing LED status 0x%x\r\n", status);
 
     tx_message_t * p_msg;
 
@@ -360,3 +389,4 @@ uint32_t ble_lbs_c_handles_assign(ble_lbs_c_t    * p_ble_lbs_c,
     return NRF_SUCCESS;
 }
 
+#endif // NRF_MODULE_ENABLED(BLE_LBS_C)

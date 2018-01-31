@@ -1,33 +1,16 @@
 #include "nrf_delay.h"
-
-#include "ble_stack.h"
+#include "BleStack.h"
+/*
 #include "gpio_hal.h"
 #include "adc_hal.h"
 #include "I2cPox.h"
 
-#define BLE_HID_REPORT_SEND_RETRY_COUNT     200
 
-static volatile bool isAdcDataReady = false, isSendActive = false, isOverrun = false;
 static uint32_t wrPtr = 0, rdPtr = 0, ovr = 0;
-static uint8_t poxData[19];
+
 static uint8_t ringBuffData[256];
 static uint32_t wrPtrB = 0;
 static uint32_t rdPtrB = 0;
-
-static void onBleHidReportReceived(const uint8_t report[], uint32_t length)
-{
-    if (report) {
-        if (report[1]) {
-            isSendActive = true;
-        } else {
-            isSendActive = false;
-            poxData[18] = 0;
-        }
-    } else {
-        isSendActive = false;
-    }
-}
-
 
 static volatile bool isPoxInt = false;
 
@@ -41,9 +24,45 @@ static void NRF_SwitchToBleMode(bool eraseBonds)
     NRF_BleSetupHidReportReadyCb(onBleHidReportReceived);
     NRF_BleStart(eraseBonds);
 }
+*/
+uint8_t cntr = 0;
+static volatile bool isAdcDataReady = false, isSendActive = false, isOverrun = false;
+static uint8_t poxData[19];
+
+static void onBleDataReceived(const uint8_t data[], uint32_t length)
+{
+    if (data) {
+        if (data[1]) {
+            isSendActive = true;
+        } else {
+            isSendActive = false;
+            poxData[18] = 0;
+        }
+        cntr = data[0] - '0';
+    } else {
+        isSendActive = false;
+    }
+}
+
 
 int main(void)
 {
+    bleStackStart(onBleDataReceived);
+
+    uint8_t text[] = {'T', 'i', 'm', 'e', ':', ' ', ' ', ' '};
+    for (;;) {
+        nrf_delay_ms(1000);
+
+        text[7] = cntr % 10 + '0';
+        text[6] = cntr / 10 + '0';
+
+        if (cntr++ >= 59) {
+            cntr = 0;
+        }
+
+        bleStackWrite(text, sizeof(text));
+    }
+    /*
     gpioHalInit();
     nrf_delay_ms(1000);
     scheduler_init();
@@ -141,5 +160,7 @@ int main(void)
 
         NRF_BleProcess();
     }
+    */
 }
+
 

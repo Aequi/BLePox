@@ -1,13 +1,41 @@
-/* Copyright (c) 2012 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /** @file
@@ -19,7 +47,7 @@
  * @brief Application timer functionality.
  *
  * @details This module enables the application to create multiple timer instances based on the RTC1
- *          peripheral. Checking for time-outs and invokation of user time-out handlers is performed
+ *          peripheral. Checking for time-outs and invocation of user time-out handlers is performed
  *          in the RTC1 interrupt handler. List handling is done using a software interrupt (SWI0).
  *          Both interrupt handlers are running in APP_LOW priority level.
  *
@@ -39,37 +67,41 @@
 
 #ifndef APP_TIMER_H__
 #define APP_TIMER_H__
-
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include "sdk_config.h"
 #include "app_error.h"
 #include "app_util.h"
 #include "compiler_abstraction.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define APP_TIMER_CLOCK_FREQ         32768                      /**< Clock frequency of the RTC timer used to implement the app timer module. */
 #define APP_TIMER_MIN_TIMEOUT_TICKS  5                          /**< Minimum value of the timeout_ticks parameter of app_timer_start(). */
 
+#ifdef RTX
+#define APP_TIMER_NODE_SIZE          40                         /**< Size of app_timer.timer_node_t (used to allocate data). */
+#else
 #define APP_TIMER_NODE_SIZE          32                         /**< Size of app_timer.timer_node_t (used to allocate data). */
+#endif // RTX
 #define APP_TIMER_USER_OP_SIZE       24                         /**< Size of app_timer.timer_user_op_t (only for use inside APP_TIMER_BUF_SIZE()). */
-#define APP_TIMER_USER_SIZE          8                          /**< Size of app_timer.timer_user_t (only for use inside APP_TIMER_BUF_SIZE()). */
-#define APP_TIMER_INT_LEVELS         3                          /**< Number of interrupt levels from where timer operations may be initiated (only for use inside APP_TIMER_BUF_SIZE()). */
 
 /**@brief Compute number of bytes required to hold the application timer data structures.
  *
- * @param[in]  OP_QUEUE_SIZE   Size of queues holding timer operations that are pending execution.
+ * @param[in]  OP_QUEUE_SIZE   Size of the queue holding timer operations that are pending execution.
  *                             Note that due to the queue implementation, this size must be one more
  *                             than the size that is actually needed.
  *
  * @return     Required application timer buffer size (in bytes).
  */
-#define APP_TIMER_BUF_SIZE(OP_QUEUE_SIZE)                                              \
-    (                                                                                              \
-        (                                                                                          \
-            APP_TIMER_INT_LEVELS                                                                   \
-            *                                                                                      \
-            (APP_TIMER_USER_SIZE + ((OP_QUEUE_SIZE) + 1) * APP_TIMER_USER_OP_SIZE)                 \
-        )                                                                                          \
+#define APP_TIMER_BUF_SIZE(OP_QUEUE_SIZE)                                  \
+    (                                                                      \
+        (                                                                  \
+            (((OP_QUEUE_SIZE) + 1) * APP_TIMER_USER_OP_SIZE)               \
+        )                                                                  \
     )
 
 /**@brief Convert milliseconds to timer ticks.
@@ -138,23 +170,23 @@ typedef enum
  *
  * @param[in]  PRESCALER        Value of the RTC1 PRESCALER register. This will decide the
  *                              timer tick rate. Set to 0 for no prescaling.
- * @param[in]  OP_QUEUES_SIZE   Size of queues holding timer operations that are pending execution.
+ * @param[in]  OP_QUEUE_SIZE    Size of the queue holding timer operations that are pending execution.
  * @param[in]  SCHEDULER_FUNC   Pointer to scheduler event handler
  *
  * @note Since this macro allocates a buffer, it must only be called once (it is OK to call it
  *       several times as long as it is from the same location, for example, to do a re-initialization).
  */
 /*lint -emacro(506, APP_TIMER_INIT) */ /* Suppress "Constant value Boolean */
-#define APP_TIMER_INIT(PRESCALER, OP_QUEUES_SIZE, SCHEDULER_FUNC)                                  \
-    do                                                                                             \
-    {                                                                                              \
-        static uint32_t APP_TIMER_BUF[CEIL_DIV(APP_TIMER_BUF_SIZE((OP_QUEUES_SIZE) + 1),           \
-                                               sizeof(uint32_t))];                                 \
-        uint32_t ERR_CODE = app_timer_init((PRESCALER),                                            \
-                                           (OP_QUEUES_SIZE) + 1,                                   \
-                                           APP_TIMER_BUF,                                          \
-                                           SCHEDULER_FUNC);                                        \
-        APP_ERROR_CHECK(ERR_CODE);                                                                 \
+#define APP_TIMER_INIT(PRESCALER, OP_QUEUE_SIZE, SCHEDULER_FUNC)                  \
+    do                                                                            \
+    {                                                                             \
+        static uint32_t APP_TIMER_BUF[CEIL_DIV(APP_TIMER_BUF_SIZE(OP_QUEUE_SIZE), \
+                                               sizeof(uint32_t))];                \
+        uint32_t ERR_CODE = app_timer_init((PRESCALER),                           \
+                                           (OP_QUEUE_SIZE) + 1,                   \
+                                           APP_TIMER_BUF,                         \
+                                           SCHEDULER_FUNC);                       \
+        APP_ERROR_CHECK(ERR_CODE);                                                \
     } while (0)
 
 
@@ -166,7 +198,7 @@ typedef enum
  *       and take care of connecting the timer module to the scheduler (if specified).
  *
  * @param[in]  prescaler           Value of the RTC1 PRESCALER register. Set to 0 for no prescaling.
- * @param[in]  op_queues_size      Size of queues holding timer operations that are pending
+ * @param[in]  op_queue_size       Size of the queue holding timer operations that are pending
  *                                 execution. Note that due to the queue implementation, this size must
  *                                 be one more than the size that is actually needed.
  * @param[in]  p_buffer            Pointer to memory buffer for internal use in the app_timer
@@ -183,7 +215,7 @@ typedef enum
  *                                       boundary or NULL).
  */
 uint32_t app_timer_init(uint32_t                      prescaler,
-                        uint8_t                       op_queues_size,
+                        uint8_t                       op_queue_size,
                         void *                        p_buffer,
                         app_timer_evt_schedule_func_t evt_schedule_func);
 
@@ -254,11 +286,9 @@ uint32_t app_timer_stop_all(void);
 
 /**@brief Function for returning the current value of the RTC1 counter.
  *
- * @param[out] p_ticks   Current value of the RTC1 counter.
- *
- * @retval     NRF_SUCCESS   If the counter was successfully read.
+ * @return    Current value of the RTC1 counter.
  */
-uint32_t app_timer_cnt_get(uint32_t * p_ticks);
+uint32_t app_timer_cnt_get(void);
 
 /**@brief Function for computing the difference between two RTC1 counter values.
  *
@@ -272,14 +302,20 @@ uint32_t app_timer_cnt_diff_compute(uint32_t   ticks_to,
                                     uint32_t   ticks_from,
                                     uint32_t * p_ticks_diff);
 
-#ifdef APP_TIMER_WITH_PROFILER
+
 /**@brief Function for getting the maximum observed operation queue utilization.
  *
  * Function for tuning the module and determining OP_QUEUE_SIZE value and thus module RAM usage.
  *
+ * @note APP_TIMER_WITH_PROFILER must be enabled to use this functionality.
+ *
  * @return Maximum number of events in queue observed so far.
  */
-uint16_t app_timer_op_queue_utilization_get(void);
+uint8_t app_timer_op_queue_utilization_get(void);
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // APP_TIMER_H__

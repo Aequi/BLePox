@@ -1,18 +1,46 @@
-/* Copyright (c) 2014 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2014 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /** @file
  *
- * @defgroup ble_sdk_srv_cts_c Current Time Service client
+ * @defgroup ble_cts_c Current Time Service client
  * @{
  * @ingroup ble_sdk_srv
  * @brief Current Time Service client module.
@@ -23,14 +51,14 @@
  *          the application can trigger a read of the current time from the connected server.
  *
  *          The module informs the application about a successful discovery using the
- *          @ref BLE_CTS_C_EVT_DISCOVERY_COMPLETE event. The handles for the CTS server is now 
+ *          @ref BLE_CTS_C_EVT_DISCOVERY_COMPLETE event. The handles for the CTS server is now
  *          available in the @ref ble_cts_c_evt_t structure. These handles must be assigned to an
  *          instance of CTS_C, using @ref ble_cts_c_handles_assign. For more information about
  *          service discovery, see the ble_discovery module documentation @ref lib_ble_db_discovery.
  *
  *          The application can then use the function @ref ble_cts_c_current_time_read to read the
  *          current time. If the read succeeds, it will trigger either a
- *          @ref BLE_CTS_C_EVT_CURRENT_TIME event or a @ref BLE_CTS_C_EVT_INVALID_TIME event 
+ *          @ref BLE_CTS_C_EVT_CURRENT_TIME event or a @ref BLE_CTS_C_EVT_INVALID_TIME event
  *          (depending on if the data that was read was actually a valid time), which is then sent
  *          to the application. The current time is then available in the params field of the
  *          passed @ref ble_cts_c_evt_t structure.
@@ -48,6 +76,10 @@
 #include "ble_date_time.h"
 #include "ble_db_discovery.h"
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**@brief "Day Date Time" field of the "Exact Time 256" field of the Current Time Characteristic. */
@@ -197,7 +229,7 @@ uint32_t ble_cts_c_current_time_read(ble_cts_c_t const * p_cts);
 /**@brief Function for assigning handles to a this instance of cts_c.
  *
  * @details Call this function when a link has been established with a peer to
- *          associate the link to this instance of the module. This makes it 
+ *          associate the link to this instance of the module. This makes it
  *          possible to handle several links and associate each link to a particular
  *          instance of this module. The connection handle and attribute handles will be
  *          provided from the discovery event @ref BLE_CTS_C_EVT_DISCOVERY_COMPLETE.
@@ -213,6 +245,11 @@ uint32_t ble_cts_c_current_time_read(ble_cts_c_t const * p_cts);
 uint32_t ble_cts_c_handles_assign(ble_cts_c_t               * p_cts,
                                   const uint16_t              conn_handle,
                                   const ble_cts_c_handles_t * p_peer_handles);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // BLE_CTS_C_H__
 

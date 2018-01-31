@@ -1,36 +1,67 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /**@file
- * @addtogroup nrf_spi Serial peripheral interface (SPI)
+ * @addtogroup nrf_spi Serial peripheral interface (SPI/SPIM)
  * @ingroup    nrf_drivers
- * @brief      Serial peripheral interface (SPI) APIs.
+ * @brief      Serial peripheral interface (SPI/SPIM) APIs.
  *
- *
- * @addtogroup nrf_spi_master SPI master HAL and driver
- * @ingroup    nrf_spi
- * @brief      SPI master APIs.
  */
 
 #ifndef NRF_DRV_SPI_H__
 #define NRF_DRV_SPI_H__
 
 #include "nordic_common.h"
-#include "nrf_drv_config.h"
+#include "sdk_config.h"
+#include "nrf_peripherals.h"
 #include "nrf_spi.h"
+#ifdef SPIM_PRESENT
 #include "nrf_spim.h"
+#endif
 #include "sdk_errors.h"
 
-#if defined(NRF52)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(SPIM_PRESENT)
     #define NRF_DRV_SPI_PERIPHERAL(id)           \
         (CONCAT_3(SPI, id, _USE_EASY_DMA) == 1 ? \
             (void *)CONCAT_2(NRF_SPIM, id)       \
@@ -47,9 +78,9 @@
 
 
 /**
- * @defgroup nrf_drv_spi_master SPI master driver
+ * @defgroup nrf_drv_spi SPI master driver
  * @{
- * @ingroup  nrf_spi_master
+ * @ingroup  nrf_spi
  *
  * @brief    Multi-instance SPI master driver.
  */
@@ -64,6 +95,10 @@ typedef struct
     uint8_t   drv_inst_idx; ///< Driver instance index.
     bool      use_easy_dma; ///< True if the peripheral with EasyDMA (SPIM) shall be used.
 } nrf_drv_spi_t;
+
+#define SPI0_INSTANCE_INDEX 0
+#define SPI1_INSTANCE_INDEX SPI0_INSTANCE_INDEX+SPI0_ENABLED
+#define SPI2_INSTANCE_INDEX SPI1_INSTANCE_INDEX+SPI1_ENABLED
 
 /**
  * @brief Macro for creating an SPI master driver instance.
@@ -131,8 +166,8 @@ typedef struct
                            *   if this signal is not needed. */
     uint8_t ss_pin;       ///< Slave Select pin number (optional).
                           /**< Set to @ref NRF_DRV_SPI_PIN_NOT_USED
-                           *   if this signal is not needed. The driver 
-                           *   supports only active low for this signal. 
+                           *   if this signal is not needed. The driver
+                           *   supports only active low for this signal.
                            *   If the signal should be active high,
                            *   it must be controlled externally. */
     uint8_t irq_priority; ///< Interrupt priority.
@@ -147,13 +182,13 @@ typedef struct
 /**
  * @brief SPI master instance default configuration.
  */
-#define NRF_DRV_SPI_DEFAULT_CONFIG(id)                       \
+#define NRF_DRV_SPI_DEFAULT_CONFIG                           \
 {                                                            \
-    .sck_pin      = CONCAT_3(SPI, id, _CONFIG_SCK_PIN),      \
-    .mosi_pin     = CONCAT_3(SPI, id, _CONFIG_MOSI_PIN),     \
-    .miso_pin     = CONCAT_3(SPI, id, _CONFIG_MISO_PIN),     \
+    .sck_pin      = NRF_DRV_SPI_PIN_NOT_USED,                \
+    .mosi_pin     = NRF_DRV_SPI_PIN_NOT_USED,                \
+    .miso_pin     = NRF_DRV_SPI_PIN_NOT_USED,                \
     .ss_pin       = NRF_DRV_SPI_PIN_NOT_USED,                \
-    .irq_priority = CONCAT_3(SPI, id, _CONFIG_IRQ_PRIORITY), \
+    .irq_priority = SPI_DEFAULT_CONFIG_IRQ_PRIORITY,         \
     .orc          = 0xFF,                                    \
     .frequency    = NRF_DRV_SPI_FREQ_4M,                     \
     .mode         = NRF_DRV_SPI_MODE_0,                      \
@@ -238,7 +273,7 @@ typedef void (*nrf_drv_spi_handler_t)(nrf_drv_spi_evt_t const * p_event);
  *
  * This function configures and enables the specified peripheral.
  *
- * @param[in] p_instance Pointer to the instance structure.
+ * @param[in] p_instance Pointer to the driver instance structure.
  * @param[in] p_config   Pointer to the structure with the initial configuration.
  *                       If NULL, the default configuration is used.
  * @param     handler    Event handler provided by the user. If NULL, transfers
@@ -247,8 +282,8 @@ typedef void (*nrf_drv_spi_handler_t)(nrf_drv_spi_evt_t const * p_event);
  * @retval NRF_SUCCESS             If initialization was successful.
  * @retval NRF_ERROR_INVALID_STATE If the driver was already initialized.
  * @retval NRF_ERROR_BUSY          If some other peripheral with the same
- *                                 instance ID is already in use. This is 
- *                                 possible only if PERIPHERAL_RESOURCE_SHARING_ENABLED 
+ *                                 instance ID is already in use. This is
+ *                                 possible only if PERIPHERAL_RESOURCE_SHARING_ENABLED
  *                                 is set to a value other than zero.
  */
 ret_code_t nrf_drv_spi_init(nrf_drv_spi_t const * const p_instance,
@@ -258,7 +293,7 @@ ret_code_t nrf_drv_spi_init(nrf_drv_spi_t const * const p_instance,
 /**
  * @brief Function for uninitializing the SPI master driver instance.
  *
- * @param[in] p_instance Pointer to the instance structure.
+ * @param[in] p_instance Pointer to the driver instance structure.
  */
 void       nrf_drv_spi_uninit(nrf_drv_spi_t const * const p_instance);
 
@@ -274,7 +309,7 @@ void       nrf_drv_spi_uninit(nrf_drv_spi_t const * const p_instance);
  *       to be placed in the Data RAM region. If they are not and an SPIM instance is
  *       used, this function will fail with the error code NRF_ERROR_INVALID_ADDR.
  *
- * @param[in] p_instance       Pointer to the instance structure.
+ * @param[in] p_instance       Pointer to the driver instance structure.
  * @param[in] p_tx_buffer      Pointer to the transmit buffer. Can be NULL
  *                             if there is nothing to send.
  * @param     tx_buffer_length Length of the transmit buffer.
@@ -326,7 +361,7 @@ ret_code_t nrf_drv_spi_transfer(nrf_drv_spi_t const * const p_instance,
  *   transfers are set up when SPIM is not active. Supported only by SPIM.
  * @note Function is intended to be used only in non-blocking mode.
  *
- * @param p_instance  SPI instance.
+ * @param p_instance  Pointer to the driver instance structure.
  * @param p_xfer_desc Pointer to the transfer descriptor.
  * @param flags       Transfer options (0 for default settings).
  *
@@ -346,7 +381,7 @@ ret_code_t nrf_drv_spi_xfer(nrf_drv_spi_t     const * const p_instance,
  * This function should be used if @ref nrf_drv_spi_xfer was called with the flag @ref NRF_DRV_SPI_FLAG_HOLD_XFER.
  * In that case, the transfer is not started by the driver, but it must be started externally by PPI.
  *
- * @param[in]  p_instance SPI instance.
+ * @param[in]  p_instance Pointer to the driver instance structure.
  *
  * @return     Start task address.
  */
@@ -358,11 +393,16 @@ uint32_t nrf_drv_spi_start_task_get(nrf_drv_spi_t const * p_instance);
  * A END event can be used to detect the end of a transfer if the @ref NRF_DRV_SPI_FLAG_NO_XFER_EVT_HANDLER
  * option is used.
  *
- * @param[in]  p_instance  SPI instance.
+ * @param[in]  p_instance Pointer to the driver instance structure.
  *
  * @return     END event address.
  */
 uint32_t nrf_drv_spi_end_event_get(nrf_drv_spi_t const * p_instance);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NRF_DRV_SPI_H__
 
 /** @} */

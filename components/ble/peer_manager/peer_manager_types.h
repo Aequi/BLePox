@@ -1,13 +1,41 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 
@@ -27,9 +55,14 @@
 #include "nrf.h"
 #include "ble_gap.h"
 #include "ble_hci.h"
+#include "ble_gatt_db.h"
 #include "app_util.h"
 #include "app_util_platform.h"
-#include "ble_gatt_db.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**@brief Handle to uniquely identify a peer for which we have persistently stored data.
@@ -134,12 +167,11 @@ typedef struct
  */
 typedef struct
 {
-    uint8_t           own_role; /**< @brief The role of the local device during bonding. */
-    ble_gap_id_key_t  peer_id;  /**< @brief The peer's peer address and identity resolution key. */
-    ble_gap_enc_key_t peer_ltk; /**< @brief The peer's long-term encryption key. */
-    ble_gap_enc_key_t own_ltk;  /**< @brief Locally generated long-term encryption key, distributed to the peer. */
+    uint8_t           own_role;    /**< @brief The BLE role of the local device during bonding. See @ref BLE_GAP_ROLES. */
+    ble_gap_id_key_t  peer_ble_id; /**< @brief The peer's Bluetooth address and identity resolution key (IRK). */
+    ble_gap_enc_key_t peer_ltk;    /**< @brief The peer's long-term encryption key (LTK) and master ID. */
+    ble_gap_enc_key_t own_ltk;     /**< @brief Locally generated long-term encryption key (LTK) and master ID, distributed to the peer. */
 } pm_peer_data_bonding_t;
-
 
 
 /**@brief Data on a local GATT database.
@@ -148,23 +180,56 @@ typedef struct
 {
     uint32_t flags;       /**< @brief Flags that describe the database attributes. */
     uint16_t len;         /**< @brief Size of the attribute array. */
-    uint8_t  data[];      /**< @brief Array to hold the database attributes. */
+    uint8_t  data[1];     /**< @brief Array to hold the database attributes. */
 } pm_peer_data_local_gatt_db_t;
 
 
-/**@brief Macro to check whether a data type is valid, thus one of the valid enum values.
+/**@brief Device Privacy.
  *
- * @param[in] data_id  The data type to check.
+ *        The privacy feature provides a way for the device to avoid being tracked over a period of
+ *        time. The privacy feature, when enabled, hides the local device identity and replaces it
+ *        with a private address that is automatically refreshed at a specified interval.
+ *
+ *        If a device still wants to be recognized by other peers, it needs to share it's Identity
+ *        Resolving Key (IRK). With this key, a device can generate a random private address that
+ *        can only be recognized by peers in possession of that key, and devices can establish
+ *        connections without revealing their real identities.
+ *
+ * @note  If the device IRK is updated, the new IRK becomes the one to be distributed in all
+ *        bonding procedures performed after @ref sd_ble_gap_privacy_set returns.
+ *        The IRK distributed during bonding procedure is the device IRK that is active when @ref
+ *        sd_ble_gap_sec_params_reply is called.
  */
-#define PM_PEER_DATA_ID_IS_VALID(data_id)                      \
-     (   ((data_id) == PM_PEER_DATA_ID_BONDING)                \
-      || ((data_id) == PM_PEER_DATA_ID_SERVICE_CHANGED_PENDING)\
-      || ((data_id) == PM_PEER_DATA_ID_GATT_LOCAL)             \
-      || ((data_id) == PM_PEER_DATA_ID_GATT_REMOTE)            \
-      || ((data_id) == PM_PEER_DATA_ID_PEER_RANK)              \
-      || ((data_id) == PM_PEER_DATA_ID_APPLICATION))
+#if (NRF_SD_BLE_API_VERSION < 3)
+
+typedef struct
+{
+    uint8_t         privacy_mode;           /**< Privacy mode, see @ref BLE_GAP_PRIVACY_MODES. Default is @ref BLE_GAP_PRIVACY_MODE_OFF. */
+    uint8_t         private_addr_type;      /**< The private address type must be either @ref BLE_GAP_ADDR_TYPE_RANDOM_PRIVATE_RESOLVABLE or @ref BLE_GAP_ADDR_TYPE_RANDOM_PRIVATE_NON_RESOLVABLE. */
+    uint16_t        private_addr_cycle_s;   /**< Private address cycle interval in seconds. Providing an address cycle value of 0 will use the default value defined by @ref BLE_GAP_DEFAULT_PRIVATE_ADDR_CYCLE_INTERVAL_S. */
+    ble_gap_irk_t * p_device_irk;           /**< When used as input, pointer to IRK structure that will be used as the default IRK. If NULL, the device default IRK will be used.
+                                                 When used as output, pointer to IRK structure where the current default IRK will be written to. If NULL, this argument is ignored.
+                                                 By default, the default IRK is used to generate random private resolvable addresses for the local device unless instructed otherwise. */
+} pm_privacy_params_t;
 
 
- /** @} */
+/**@defgroup BLE_GAP_PRIVACY_MODES Privacy modes
+ * @{ */
+#define BLE_GAP_PRIVACY_MODE_OFF                0x00 /**< Device will send and accept its identity address for its own address. */
+#define BLE_GAP_PRIVACY_MODE_DEVICE_PRIVACY     0x01 /**< Device will send and accept only private addresses for its own address. */
+/**@} */
+
+#else
+
+typedef ble_gap_privacy_params_t pm_privacy_params_t;
+
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PEER_MANAGER_TYPES_H__ */
+
+/** @} */

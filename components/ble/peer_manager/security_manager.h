@@ -1,13 +1,41 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 
@@ -20,6 +48,10 @@
 #include "ble_gap.h"
 #include "peer_manager_types.h"
 #include "security_dispatcher.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -60,7 +92,6 @@ typedef struct
 } sm_evt_t;
 
 
-
 /**@brief Event handler for events from the Security Manager module.
  *
  * @param[in]  event        The event that has happened.
@@ -69,17 +100,12 @@ typedef struct
 typedef void (*sm_evt_handler_t)(sm_evt_t const * p_event);
 
 
-/**@brief Function for registering with the Security Manager module. This function also
- *        initializes the module if uninitialized.
+/**@brief Function for initializing the Security Manager module.
  *
- * @param[in]  evt_handler  Callback for events from the Security Manager module.
- *
- * @retval NRF_SUCCESS        Registration was successful.
- * @retval NRF_ERROR_NO_MEM   No more registrations possible.
- * @retval NRF_ERROR_NULL     evt_handler was NULL.
- * @retval NRF_ERROR_INTERNAL An unexpected error occurred.
+ * @retval NRF_SUCCESS        If initialization was successful.
+ * @retval NRF_ERROR_INTERNAL If an unexpected error occurred.
  */
-ret_code_t sm_register(sm_evt_handler_t evt_handler);
+ret_code_t sm_init(void);
 
 
 /**@brief Function for dispatching SoftDevice events to the Security Manager module.
@@ -140,8 +166,8 @@ ret_code_t sm_lesc_public_key_set(ble_gap_lesc_p256_pk_t * p_public_key);
  * @warning This function is not yet implemented.
  *
  * @note If this function returns an @ref NRF_ERROR_NULL, @ref NRF_ERROR_INVALID_PARAM, @ref
- *       BLE_ERROR_INVALID_CONN_HANDLE, or @ref NRF_ERROR_NO_MEM, this function can be called again
- *       after corrective action.
+ *       BLE_ERROR_INVALID_CONN_HANDLE, or @ref NRF_ERROR_STORAGE_FULL, this function can be called
+ *       again after corrective action.
  *
  * @note To reject a request, call this function with NULL p_sec_params.
  *
@@ -156,7 +182,7 @@ ret_code_t sm_lesc_public_key_set(ble_gap_lesc_p256_pk_t * p_public_key);
  * @retval NRF_ERROR_TIMEOUT              There has been an SMP timeout, so no more SMP operations
  *                                        can be performed on this link.
  * @retval BLE_ERROR_INVALID_CONN_HANDLE  Invalid connection handle.
- * @retval NRF_ERROR_NO_MEM               No more room in flash. Fix and reattempt later.
+ * @retval NRF_ERROR_STORAGE_FULL         No more room in flash. Fix and reattempt later.
  * @retval NRF_ERROR_BUSY                 No write buffer. Reattempt later.
  */
 ret_code_t sm_sec_params_reply(uint16_t conn_handle, ble_gap_sec_params_t * p_sec_params);
@@ -188,5 +214,10 @@ ret_code_t sm_link_secure(uint16_t conn_handle, bool force_repairing);
 /** @}
  * @endcond
  */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SECURITY_MANAGER_H__ */

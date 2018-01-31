@@ -1,13 +1,41 @@
-/* Copyright (c) 2013 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2013 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /** @file
@@ -43,19 +71,17 @@
     #include "ble.h"
 #endif
 #include "app_ram_base.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #define SOFTDEVICE_SCHED_EVT_SIZE       0                                                 /**< Size of button events being passed through the scheduler (is to be used for computing the maximum size of scheduler events). For SoftDevice events, this size is 0, since the events are being pulled in the event handler. */
 #define SYS_EVT_MSG_BUF_SIZE            sizeof(uint32_t)                                  /**< Size of System (SOC) event message buffer. */
 
 
-#define CHECK_RAM_START_ADDR_INTERN(CENTRAL_LINK_COUNT, PERIPHERAL_LINK_COUNT)              \
-    do{                                                                                     \
-        uint32_t app_ram_start_addr = APP_RAM_BASE_CENTRAL_LINKS_##CENTRAL_LINK_COUNT##_PERIPH_LINKS_##PERIPHERAL_LINK_COUNT##_SEC_COUNT_0_MID_BW; \
-        err_code = sd_check_ram_start(app_ram_start_addr);                                  \
-        APP_ERROR_CHECK(err_code);                                                          \
-    } while (0)
 
-/** @brief Macro for checking the RAM requirement of the SoftDevice */
-#define CHECK_RAM_START_ADDR(C_LINK_CNT, P_LINK_CNT) CHECK_RAM_START_ADDR_INTERN(C_LINK_CNT, P_LINK_CNT)
+/** @brief Macro for checking the RAM requirement of the SoftDevice.  */
+#define CHECK_RAM_START_ADDR(C_LINK_CNT, P_LINK_CNT)
 
 
 /**@brief     Function for checking the RAM requirement of the SoftDevice.
@@ -108,7 +134,7 @@ typedef void (*sys_evt_handler_t) (uint32_t evt_id);
  * @retval false SD is not initialized and SD commands should not be called.
  * @retval true  SD is already initialized
  */
-bool softdevice_handler_isEnabled(void);
+bool softdevice_handler_is_enabled(void);
 
 /**@brief      Function for initializing the stack handler module.
  *
@@ -124,7 +150,7 @@ bool softdevice_handler_isEnabled(void);
  *                                 used, this buffer must be provided by the application. The
  *                                 buffer must be large enough to hold the biggest stack event the
  *                                 application is supposed to handle. The buffer must be aligned to
- *                                 a 4 byte boundary. This parameter is unused if BLE stack support 
+ *                                 a 4 byte boundary. This parameter is unused if BLE stack support
  *                                 is not required.
  * @param[in]  ble_evt_buffer_size Size of SoftDevice BLE event buffer. This parameter is unused if
  *                                 BLE stack support is not required.
@@ -149,6 +175,24 @@ uint32_t softdevice_handler_init(nrf_clock_lf_cfg_t *              p_clock_lf_cf
  *            of this module.
  */
 uint32_t softdevice_handler_sd_disable(void);
+
+/**@brief     Function for suspending the event handler.
+ *
+ * @details   When event handler is disabled, no new events are pulled from SoftDevice.
+ *            Application can suspend pulling incoming events when its event queue is full.
+ */
+void softdevice_handler_suspend(void);
+
+/**@brief     Function for re-enabling the event handler after suspending.
+ */
+void softdevice_handler_resume(void);
+
+/**@brief Function for retrieving the information about the event handler state
+ *
+ * @retval false Event handler is active.
+ * @retval true  Event handler is suspended and events from SD will not be pulled.
+ */
+bool softdevice_handler_is_suspended(void);
 
 
 /**@brief     Function for registering for System (SOC) events.
@@ -182,7 +226,7 @@ uint32_t softdevice_sys_evt_handler_set(sys_evt_handler_t sys_evt_handler);
  *
  * @retval    NRF_SUCCESS     If the operation was successful.
  */
-uint32_t softdevice_enable_get_default_config(uint8_t central_links_count, 
+uint32_t softdevice_enable_get_default_config(uint8_t central_links_count,
                                               uint8_t periph_links_count,
                                               ble_enable_params_t * p_ble_enable_params);
 
@@ -207,6 +251,11 @@ void intern_softdevice_events_execute(void);
 
 
 /**@endcond */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SOFTDEVICE_HANDLER_H__
 

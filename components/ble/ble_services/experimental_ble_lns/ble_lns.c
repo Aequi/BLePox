@@ -1,13 +1,41 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 #include "ble_lns.h"
@@ -15,21 +43,8 @@
 #include "ble_ln_common.h"
 #include "sdk_common.h"
 
-#if 0
-/**
- * @defgroup lns_log Module's log macros
- *
- * @note LNS_LOG will only log if DEBUG is set.
- */
-#ifndef LNS_DISABLE_LOGS
-#define LNS_LOG(format, ...)   NRF_LOG_PRINTF_DEBUG("[LNS] " format, ##__VA_ARGS__)  /**< Debug logger macro */
-#define LNS_ERR(format, ...)   NRF_LOG_PRINTF_ERROR("[LNS] " format, ##__VA_ARGS__)  /**< Error logger macro */
-#else
-#define LNS_LOG(...)
-#define LNS_ERR(...)
-#endif // LNS_DISABLE_LOGS
-#endif
-#define LNS_LOG(...)
+#define NRF_LOG_MODULE_NAME "BLE_LNS"
+#include "nrf_log.h"
 
 // Location and Speed flag bits
 #define LOC_SPEED_FLAG_INSTANT_SPEED_PRESENT             (0x01 << 0)         /**< Instantaneous Speed Present bit. */
@@ -876,7 +891,7 @@ ret_code_t ble_lns_init(ble_lns_t * p_lns, ble_lns_init_t const * p_lns_init)
         memcpy(&p_lns->ctrlpt_handles, &p_lns->ctrl_pt.ctrlpt_handles, sizeof(ble_gatts_char_handles_t));
     }
 
-    LNS_LOG("Initialized\n");
+    NRF_LOG_DEBUG("Initialized\r\n");
 
     return NRF_SUCCESS;
 }

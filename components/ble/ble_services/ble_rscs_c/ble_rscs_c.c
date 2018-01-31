@@ -1,26 +1,56 @@
-/*
- * Copyright (c) 2012 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is confidential property of Nordic Semiconductor. The use,
- * copying, transfer or disclosure of such information is prohibited except by express written
- * agreement with Nordic Semiconductor.
- *
+/**
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /**@cond To Make Doxygen skip documentation generation for this file.
  * @{
  */
-
+#include "sdk_common.h"
+#if NRF_MODULE_ENABLED(BLE_RSCS_C)
 #include "ble_rscs_c.h"
 #include "ble_db_discovery.h"
 #include "ble_types.h"
 #include "ble_srv_common.h"
 #include "ble_gattc.h"
-#include "app_trace.h"
-#include "sdk_common.h"
-#include "nrf_log.h"
 
-#define LOG                    NRF_LOG_PRINTF         /**< Debug logger macro that will be used in this file to do logging of important information over UART or RTT. */
+#define NRF_LOG_MODULE_NAME "BLE_RSCS_C"
+#include "nrf_log.h"
 
 #define TX_BUFFER_MASK         0x07                  /**< TX Buffer mask, must be a mask of continuous zeroes, followed by continuous sequence of ones: 000...111. */
 #define TX_BUFFER_SIZE         (TX_BUFFER_MASK + 1)  /**< Size of send buffer, which is 1 higher than the mask. */
@@ -81,13 +111,13 @@ static void tx_buffer_process(void)
         }
         if (err_code == NRF_SUCCESS)
         {
-            LOG("[RSCS_C]: SD Read/Write API returns Success.\r\n");
+            NRF_LOG_INFO("SD Read/Write API returns Success.\r\n");
             m_tx_index++;
             m_tx_index &= TX_BUFFER_MASK;
         }
         else
         {
-            LOG("[RSCS_C]: SD Read/Write API returns error. This message sending will be "
+            NRF_LOG_INFO("SD Read/Write API returns error. This message sending will be "
                 "attempted again..\r\n");
         }
     }
@@ -130,7 +160,7 @@ static void on_hvx(ble_rscs_c_t * p_ble_rscs_c, const ble_evt_t * p_ble_evt)
     {
         return;
     }
-    
+
     // Check if this is a Running Speed and Cadence notification.
     if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_rscs_c->peer_db.rsc_handle)
     {
@@ -140,7 +170,7 @@ static void on_hvx(ble_rscs_c_t * p_ble_rscs_c, const ble_evt_t * p_ble_evt)
         ble_rscs_c_evt.conn_handle = p_ble_evt->evt.gattc_evt.conn_handle;
 
         //lint -save -e415 -e416 -e662 "Access of out of bounds pointer" "Creation of out of bounds pointer"
-        
+
         // Flags field
         ble_rscs_c_evt.params.rsc.is_inst_stride_len_present = p_notif->data[index] >> BLE_RSCS_INSTANT_STRIDE_LEN_PRESENT    & 0x01;
         ble_rscs_c_evt.params.rsc.is_total_distance_present  = p_notif->data[index] >> BLE_RSCS_TOTAL_DISTANCE_PRESENT        & 0x01;
@@ -215,10 +245,10 @@ void ble_rscs_on_db_disc_evt(ble_rscs_c_t * p_ble_rscs_c, const ble_db_discovery
             }
         }
 
-        LOG("[rscs_c]: Running Speed and Cadence Service discovered at peer.\r\n");
+        NRF_LOG_INFO("Running Speed and Cadence Service discovered at peer.\r\n");
 
         //If the instance has been assigned prior to db_discovery, assign the db_handles
-        if(p_ble_rscs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
+        if (p_ble_rscs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
         {
             if ((p_ble_rscs_c->peer_db.rsc_cccd_handle == BLE_GATT_HANDLE_INVALID)&&
                 (p_ble_rscs_c->peer_db.rsc_handle == BLE_GATT_HANDLE_INVALID))
@@ -263,7 +293,7 @@ uint32_t ble_rscs_c_handles_assign(ble_rscs_c_t *    p_ble_rscs_c,
     {
         p_ble_rscs_c->peer_db = *p_peer_handles;
     }
-    
+
     return NRF_SUCCESS;
 }
 
@@ -319,7 +349,7 @@ void ble_rscs_c_on_ble_evt(ble_rscs_c_t * p_ble_rscs_c, const ble_evt_t * p_ble_
  */
 static uint32_t cccd_configure(uint16_t conn_handle, uint16_t handle_cccd, bool enable)
 {
-    LOG("[rscs_c]: Configuring CCCD. CCCD Handle = %d, Connection Handle = %d\r\n",
+    NRF_LOG_INFO("Configuring CCCD. CCCD Handle = %d, Connection Handle = %d\r\n",
         handle_cccd, conn_handle);
 
     tx_message_t * p_msg;
@@ -358,3 +388,4 @@ uint32_t ble_rscs_c_rsc_notif_enable(ble_rscs_c_t * p_ble_rscs_c)
 /** @}
  *  @endcond
  */
+#endif // NRF_MODULE_ENABLED(BLE_RSCS_C)

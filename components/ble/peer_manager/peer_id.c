@@ -1,16 +1,45 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
- *
+/**
+ * Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
-
+#include "sdk_common.h"
+#if NRF_MODULE_ENABLED(PEER_MANAGER)
 #include "peer_id.h"
 
 #include <stdint.h>
@@ -22,7 +51,7 @@
 
 typedef struct
 {
-    uint8_t active_peer_ids[MUTEX_STORAGE_SIZE(PM_PEER_ID_N_AVAILABLE_IDS)];  /**< Bitmap designating which peer IDs are in use. */
+    uint8_t used_peer_ids[MUTEX_STORAGE_SIZE(PM_PEER_ID_N_AVAILABLE_IDS)];  /**< Bitmap designating which peer IDs are in use. */
     uint8_t deleted_peer_ids[MUTEX_STORAGE_SIZE(PM_PEER_ID_N_AVAILABLE_IDS)]; /**< Bitmap designating which peer IDs are marked for deletion. */
 } pi_t;
 
@@ -39,7 +68,7 @@ static void internal_state_reset(pi_t * p_pi)
 void peer_id_init(void)
 {
     internal_state_reset(&m_pi);
-    pm_mutex_init(m_pi.active_peer_ids, PM_PEER_ID_N_AVAILABLE_IDS);
+    pm_mutex_init(m_pi.used_peer_ids, PM_PEER_ID_N_AVAILABLE_IDS);
     pm_mutex_init(m_pi.deleted_peer_ids, PM_PEER_ID_N_AVAILABLE_IDS);
 }
 
@@ -75,24 +104,28 @@ static void release(pm_peer_id_t peer_id, uint8_t * mutex_group)
 
 pm_peer_id_t peer_id_allocate(pm_peer_id_t peer_id)
 {
-    return claim(peer_id, m_pi.active_peer_ids);
+    return claim(peer_id, m_pi.used_peer_ids);
 }
 
 
 bool peer_id_delete(pm_peer_id_t peer_id)
 {
+    pm_peer_id_t deleted_peer_id;
+
     if (peer_id == PM_PEER_ID_INVALID)
     {
         return false;
     }
-    pm_peer_id_t deleted_id = claim(peer_id, m_pi.deleted_peer_ids);
-    return (deleted_id == peer_id);
+
+    deleted_peer_id = claim(peer_id, m_pi.deleted_peer_ids);
+
+    return (deleted_peer_id == peer_id);
 }
 
 
 void peer_id_free(pm_peer_id_t peer_id)
 {
-    release(peer_id, m_pi.active_peer_ids);
+    release(peer_id, m_pi.used_peer_ids);
     release(peer_id, m_pi.deleted_peer_ids);
 }
 
@@ -101,7 +134,7 @@ bool peer_id_is_allocated(pm_peer_id_t peer_id)
 {
     if (peer_id < PM_PEER_ID_N_AVAILABLE_IDS)
     {
-        return pm_mutex_lock_status_get(m_pi.active_peer_ids, peer_id);
+        return pm_mutex_lock_status_get(m_pi.used_peer_ids, peer_id);
     }
     return false;
 }
@@ -132,9 +165,21 @@ pm_peer_id_t next_id_get(pm_peer_id_t prev_peer_id, uint8_t * mutex_group)
 }
 
 
-pm_peer_id_t peer_id_get_next_used(pm_peer_id_t prev_peer_id)
+pm_peer_id_t peer_id_get_next_used(pm_peer_id_t peer_id)
 {
-    return next_id_get(prev_peer_id, m_pi.active_peer_ids);
+    peer_id = next_id_get(peer_id, m_pi.used_peer_ids);
+
+    while (peer_id != PM_PEER_ID_INVALID)
+    {
+        if (!peer_id_is_deleted(peer_id))
+        {
+            return peer_id;
+        }
+
+        peer_id = next_id_get(peer_id, m_pi.used_peer_ids);
+    }
+
+    return peer_id;
 }
 
 
@@ -150,10 +195,9 @@ uint32_t peer_id_n_ids(void)
 
     for (pm_peer_id_t i = 0; i < PM_PEER_ID_N_AVAILABLE_IDS; i++)
     {
-        n_ids += pm_mutex_lock_status_get(m_pi.active_peer_ids, i);
+        n_ids += pm_mutex_lock_status_get(m_pi.used_peer_ids, i);
     }
 
     return n_ids;
 }
-
-
+#endif // NRF_MODULE_ENABLED(PEER_MANAGER)

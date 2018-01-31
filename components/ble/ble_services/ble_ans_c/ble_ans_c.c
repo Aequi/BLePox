@@ -1,28 +1,58 @@
-/* Copyright (c) 2012 Nordic Semiconductor. All Rights Reserved.
- *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
+/**
+ * Copyright (c) 2012 - 2017, Nordic Semiconductor ASA
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ * 
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ * 
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ * 
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
  */
 
 /* Attention!
 *  To maintain compliance with Nordic Semiconductor ASA’s Bluetooth profile
 *  qualification listings, this section of source code must not be modified.
 */
-
+#include "sdk_common.h"
+#if NRF_MODULE_ENABLED(BLE_ANS_C)
 #include "ble_ans_c.h"
 #include <string.h>
 #include <stdbool.h>
 #include "ble_err.h"
 #include "ble_srv_common.h"
-#include "nordic_common.h"
 #include "nrf_assert.h"
 #include "ble_db_discovery.h"
-
+#define NRF_LOG_MODULE_NAME "BLE_ANS_C"
+#include "nrf_log.h"
 
 #define NOTIFICATION_DATA_LENGTH 2                              /**< The mandatory length of notification data. After the mandatory data, the optional message is located. */
 #define READ_DATA_LENGTH_MIN     1                              /**< Minimum data length in a valid Alert Notification Read Response message. */
@@ -45,7 +75,7 @@ typedef struct
 {
     uint8_t                  gattc_value[WRITE_MESSAGE_LENGTH]; /**< The message to write. */
     ble_gattc_write_params_t gattc_params;                      /**< GATTC parameters for this message. */
-} write_params_t;
+} ans_write_params_t;
 
 /**@brief Structure for holding data to be transmitted to the connected central.
  */
@@ -56,11 +86,11 @@ typedef struct
     union
     {
         uint16_t       read_handle;                             /**< Read request message. */
-        write_params_t write_req;                               /**< Write request message. */
+        ans_write_params_t write_req;                           /**< Write request message. */
     } req;
-} tx_message_t;
+} ans_tx_message_t;
 
-static tx_message_t m_tx_buffer[TX_BUFFER_SIZE];                /**< Transmit buffer for messages to be transmitted to the central. */
+static ans_tx_message_t m_tx_buffer[TX_BUFFER_SIZE];            /**< Transmit buffer for messages to be transmitted to the central. */
 static uint32_t     m_tx_insert_index = 0;                      /**< Current index in the transmit buffer where next message should be inserted. */
 static uint32_t     m_tx_index = 0;                             /**< Current index in the transmit buffer from where the next message to be transmitted resides. */
 
@@ -132,7 +162,7 @@ void ble_ans_c_on_db_disc_evt(ble_ans_c_t * p_ans, const ble_db_discovery_evt_t 
     memset(&evt, 0, sizeof(ble_ans_c_evt_t));
     evt.conn_handle = p_evt->conn_handle;
     evt.evt_type = BLE_ANS_C_EVT_DISCOVERY_FAILED;
-    
+
     // Check if the Alert Notification Service was discovered.
     if (p_evt->evt_type == BLE_DB_DISCOVERY_COMPLETE
         &&
@@ -148,31 +178,31 @@ void ble_ans_c_on_db_disc_evt(ble_ans_c_t * p_ans, const ble_db_discovery_evt_t 
             switch (p_char->characteristic.uuid.uuid)
             {
                 case BLE_UUID_ALERT_NOTIFICATION_CONTROL_POINT_CHAR:
-                    NRF_LOG_PRINTF("[ANS] Found Ctrlpt \n\r");
+                    NRF_LOG_INFO("Found Ctrlpt \r\n\r");
                     char_set(&evt.data.service.alert_notif_ctrl_point, &p_char->characteristic);
                     break;
 
                 case BLE_UUID_UNREAD_ALERT_CHAR:
-                    NRF_LOG_PRINTF("[ANS] Found Unread Alert \n\r");
+                    NRF_LOG_INFO("Found Unread Alert \r\n\r");
                     char_set(&evt.data.service.unread_alert_status, &p_char->characteristic);
                     char_cccd_set(&evt.data.service.unread_alert_cccd,
                                   p_char->cccd_handle);
                     break;
 
                 case BLE_UUID_NEW_ALERT_CHAR:
-                    NRF_LOG_PRINTF("[ANS] Found New Alert \n\r");
+                    NRF_LOG_INFO("Found New Alert \r\n\r");
                     char_set(&evt.data.service.new_alert, &p_char->characteristic);
                     char_cccd_set(&evt.data.service.new_alert_cccd,
                                   p_char->cccd_handle);
                     break;
 
                 case BLE_UUID_SUPPORTED_UNREAD_ALERT_CATEGORY_CHAR:
-                    NRF_LOG_PRINTF("[ANS] Found supported unread alert category \n\r");
+                    NRF_LOG_INFO("Found supported unread alert category \r\n\r");
                     char_set(&evt.data.service.suported_unread_alert_cat, &p_char->characteristic);
                     break;
 
                 case BLE_UUID_SUPPORTED_NEW_ALERT_CATEGORY_CHAR:
-                    NRF_LOG_PRINTF("[ANS] Found supported new alert category \n\r");
+                    NRF_LOG_INFO("Found supported new alert category \r\n\r");
                     char_set(&evt.data.service.suported_new_alert_cat, &p_char->characteristic);
                     break;
 
@@ -375,7 +405,7 @@ uint32_t ble_ans_c_init(ble_ans_c_t * p_ans, const ble_ans_c_init_t * p_ans_init
  */
 static uint32_t cccd_configure(uint16_t conn_handle, uint16_t handle_cccd, bool enable)
 {
-    tx_message_t * p_msg;
+    ans_tx_message_t * p_msg;
     uint16_t       cccd_val = enable ? BLE_GATT_HVX_NOTIFICATION : 0;
 
     p_msg              = &m_tx_buffer[m_tx_insert_index++];
@@ -442,7 +472,7 @@ uint32_t ble_ans_c_disable_notif_unread_alert(const ble_ans_c_t * p_ans)
 uint32_t ble_ans_c_control_point_write(const ble_ans_c_t             * p_ans,
                                        const ble_ans_control_point_t * p_control_point)
 {
-    tx_message_t * p_msg;
+    ans_tx_message_t * p_msg;
 
     p_msg              = &m_tx_buffer[m_tx_insert_index++];
     m_tx_insert_index &= TX_BUFFER_MASK;
@@ -464,7 +494,7 @@ uint32_t ble_ans_c_control_point_write(const ble_ans_c_t             * p_ans,
 
 uint32_t ble_ans_c_new_alert_read(const ble_ans_c_t * p_ans)
 {
-    tx_message_t * msg;
+    ans_tx_message_t * msg;
 
     msg                = &m_tx_buffer[m_tx_insert_index++];
     m_tx_insert_index &= TX_BUFFER_MASK;
@@ -480,7 +510,7 @@ uint32_t ble_ans_c_new_alert_read(const ble_ans_c_t * p_ans)
 
 uint32_t ble_ans_c_unread_alert_read(const ble_ans_c_t * p_ans)
 {
-    tx_message_t * msg;
+    ans_tx_message_t * msg;
 
     msg                = &m_tx_buffer[m_tx_insert_index++];
     m_tx_insert_index &= TX_BUFFER_MASK;
@@ -542,3 +572,4 @@ uint32_t ble_ans_c_handles_assign(ble_ans_c_t               * p_ans,
 
     return NRF_SUCCESS;
 }
+#endif // NRF_MODULE_ENABLED(BLE_ANS_C)
