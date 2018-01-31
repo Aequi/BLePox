@@ -7,8 +7,6 @@
 typedef void (*I2cPoxIntCallback)(void);
 
 void i2cPoxInit(I2cPoxIntCallback i2cIntCb);
-uint8_t i2cPoxReadReg(uint8_t address);
-void i2cPoxWriteReg(uint8_t address, uint8_t byte);
 
 uint8_t i2cPoxReadIntStatus(void);
 uint8_t i2cPoxReadReadPtr(void);

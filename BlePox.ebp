@@ -136,10 +136,12 @@
 		</Unit>
 		<Unit filename="components\drivers_nrf\gpiote\nrf_drv_gpiote.h" />
 		<Unit filename="components\drivers_nrf\hal\nrf_clock.h" />
-		<Unit filename="components\drivers_nrf\uart\nrf_drv_uart.c">
+		<Unit filename="components\drivers_nrf\hal\nrf_twi.h" />
+		<Unit filename="components\drivers_nrf\hal\nrf_twim.h" />
+		<Unit filename="components\drivers_nrf\twi_master\nrf_drv_twi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="components\drivers_nrf\uart\nrf_drv_uart.h" />
+		<Unit filename="components\drivers_nrf\twi_master\nrf_drv_twi.h" />
 		<Unit filename="components\libraries\bsp\bsp.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -163,10 +165,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="components\libraries\timer\app_timer.h" />
-		<Unit filename="components\libraries\uart\app_uart.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="components\libraries\uart\app_uart.h" />
 		<Unit filename="components\libraries\util\app_error.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -208,6 +206,10 @@
 		</Unit>
 		<Unit filename="source\app\PoxService\PoxService.h" />
 		<Unit filename="source\app\sdk_config.h" />
+		<Unit filename="source\I2cPox\I2cPox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="source\I2cPox\I2cPox.h" />
 		<Extensions>
 			<code_completion />
 			<debugger>

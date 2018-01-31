@@ -43,14 +43,14 @@ static void i2cWrite(uint8_t addr, uint8_t const data[], size_t size)
     nrf_drv_twi_tx(&m_twi_master, POX_ADDRESS, buffer, size + 1, false);
 }
 
-uint8_t i2cPoxReadReg(uint8_t address)
+static uint8_t i2cPoxReadReg(uint8_t address)
 {
     static uint8_t regVal;
     i2cRead(address, &regVal, 1);
     return regVal;
 }
 
-void i2cPoxWriteReg(uint8_t address, uint8_t byte)
+static void i2cPoxWriteReg(uint8_t address, uint8_t byte)
 {
     static uint8_t regVal;
     regVal = byte;
