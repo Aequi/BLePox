@@ -72,11 +72,11 @@ int main(void)
             }
 
             if (poxIntCntr++ == 10000) {
-                i2cPoxTriggerTemp();
+                //i2cPoxTriggerTemp();
             }
 
             if (poxIntCntr == 15000) {
-                i2cPoxReadTemp(temperature);
+                //i2cPoxReadTemp(temperature);
                 poxIntCntr = 0;
             }
 
@@ -102,15 +102,17 @@ int main(void)
             poxData[16] = temperature[0];
             poxData[17] = temperature[1];
 
-            if (isSendActive) {
+            if (true/*isSendActive*/) {
                 if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
-                    if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
-                        if (!bleStackWrite(poxData, sizeof(poxData)) != 0) {
-                            if (!bleStackWrite(poxData, sizeof(poxData)) != 0) {
+/*                    if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
+                        if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
+                            if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
+                                if (bleStackWrite(poxData, sizeof(poxData)) != 0) {
 
+                                }
                             }
                         }
-                    }
+                    }*/
                 }
                 poxData[18]++;
             }

@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TWI_SCL_PIN         15
-#define TWI_SDA_PIN         16
-#define INT_PIN             17
+#define TWI_SCL_PIN         1
+#define TWI_SDA_PIN         30
+#define INT_PIN             3
 #define I2C_INSTANCE        0
 #define POX_ADDRESS         (0xAE >> 1)
 #define I2C_POX_BUFF_SIZE   256
@@ -157,4 +157,10 @@ void i2cPoxTriggerTemp(void)
 void i2cPoxReadTemp(uint8_t temp[])
 {
     return i2cRead(0x16, temp, 2);
+}
+
+void i2cPoxSleep(void)
+{
+    i2cPoxWriteReg(0x09, 0x00);
+    i2cPoxWriteReg(0x06, 0x80);
 }
